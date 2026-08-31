@@ -1,0 +1,7 @@
+variant,top10_tags_retained,bottom10_tags_retained,new_entrants_at_the_top,new_entrants_at_the_bottom
+primary - 2022 | 30-day window | floor 886 | Wilson,10,10,,
+lifetime outcomes instead of a 30-day window,9,7,julia,iframe audio installation
+2021 (last complete calendar year) instead of 2022,6,4,java-stream grep jq data.table,facebook cordova push-notification safari installation iis
+volume floor 322 (5pp precision) instead of 886,5,1,data-manipulation tidyr data.table jq purrr,magento2 ckeditor facebook instagram appium facebook-graph-api cpanel elementor usb
+volume floor 2000 instead of 886,4,4,string pandas list rust dictionary ggplot2,heroku jenkins nginx npm graphql pdf
+rank on the observed rate instead of a confidence bound,9,8,c++20,plugins iframe
