@@ -23,7 +23,8 @@ for the first time. The scanned figure is the one worth reporting.
 | `sql/02_tag_approval/23_ranking_sensitivity.sql` | 0.00 | 6 | results/23_ranking_sensitivity.csv |
 | `sql/03_post_qualities/30_build_asker_history.sql` | 0.94 | - | table |
 | `sql/03_post_qualities/31_post_quality_rates.sql` | 0.30 | 60 | results/31_post_quality_rates.csv |
-| | **52.21** | | |
+| `sql/03_post_qualities/32_error_text_within_tag.sql` | 0.14 | 1 | results/32_error_text_within_tag.csv |
+| | **52.35** | | |
 
 The BigQuery sandbox allows 1024 GB of query processing per month.
 

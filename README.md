@@ -194,9 +194,15 @@ have called this "no relationship". The same shape appears in title length.
 
 **Pasting an error message is associated with *lower* acceptance (0.90), not
 higher.** I expected the opposite: an error message reads like a specific,
-reproducible problem. The plausible reading is that error text marks the
-environment-dependent questions from prompt 1 — the ones with no answer that is
-true everywhere. I have not tested that, and it is a good candidate for prompt 3.
+reproducible problem. My first explanation was that error text merely marks the
+environment-dependent topics that already rank badly in prompt 1 — in which case
+the attribute would be telling us nothing the tag had not. That explanation is
+mostly wrong. Comparing questions with and without error text *inside the same
+tag* across 421 tags, the gap goes from 3.3 points to 2.7
+(`sql/03_post_qualities/32_error_text_within_tag.sql`): **82% of it survives with
+the topic held constant.** It is also not a universal rule — error text goes with
+worse acceptance in 246 of those tags and better in 175. A modest real effect with
+genuine heterogeneity, not a law.
 
 **Question comment count has essentially no relationship with either outcome**
 (every bucket between 0.92 and 1.06). I had expected comments to signal an unclear
@@ -340,7 +346,7 @@ bq --location=US mk --dataset "$BQ_PROJECT:so_analysis"
 BQ_PROJECT=your-project-id ./scripts/run_queries.sh
 ```
 
-**Cost.** The whole analysis bills **52.2 GB**, 5% of the BigQuery sandbox's
+**Cost.** The whole analysis bills **52.4 GB**, 5% of the BigQuery sandbox's
 monthly allowance, and 36.7 GB of that is a single query. `posts_questions` is not
 partitioned or clustered — I checked — so a `WHERE creation_date >= ...` filter
 reduces nothing. In fact adding one to a bare `COUNT(*)` takes it from 0 bytes to
