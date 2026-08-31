@@ -53,8 +53,9 @@ rows returned, which drives every rule below.
 17. `LIMIT` does **not** reduce bytes billed. It caps rows returned, not bytes
     scanned. It is used here to keep committed result files readable, never as a
     cost control.
-18. Column pruning is the only real cost lever on this dataset — see
-    `docs/data-quality.md` for the partitioning check and what it implies.
+18. Column pruning is the only real cost lever on this dataset. These public
+    tables are not partitioned or clustered, so a date filter reduces nothing —
+    the check and what it implies are in the README's Cost section.
 19. Materialize the analysis cohort once. Every subsequent query then reads a
     narrow table measured in megabytes rather than re-scanning the source.
 

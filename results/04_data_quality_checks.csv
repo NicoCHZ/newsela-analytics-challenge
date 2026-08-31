@@ -1,14 +1,14 @@
 check_name,observed,severity,expectation,status
 freshness: days since the newest question in the source,1436,blocking,expected under 7 in a live pipeline,FAIL
 accepted answer created before its own question,1,blocking,expected 0,FAIL
-questions with more than five tags,0,blocking,expected 0 - that is the site limit,PASS
-questions asked after the snapshot date,0,blocking,expected 0,PASS
-questions with no tags,0,blocking,expected 0,PASS
-negative answer_count,0,blocking,expected 0,PASS
 accepted answer belongs to a different question,0,blocking,expected 0,PASS
+negative answer_count,0,blocking,expected 0,PASS
 marked accepted but answer_count is zero,0,blocking,expected 0,PASS
-accepted answer id not present in posts_answers,0,blocking,expected 0,PASS
 empty title or body,0,blocking,expected 0,PASS
+questions asked after the snapshot date,0,blocking,expected 0,PASS
+questions with more than five tags,0,blocking,expected 0 - that is the site limit,PASS
+questions with no tags,0,blocking,expected 0,PASS
+accepted answer id not present in posts_answers,0,blocking,expected 0,PASS
 duplicate question ids,0,blocking,expected 0,PASS
 asker account deleted after posting,36575,informational,expected non-zero; a post-hoc attribute,NOTED
 community wiki posts in the cohort,3,informational,no single owner - acceptance means something different,NOTED
