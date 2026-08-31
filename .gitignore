@@ -1,0 +1,13 @@
+# Challenge brief provided by Newsela (not redistributed)
+*.pdf
+
+# Credentials
+.env
+*.env
+service-account*.json
+*-key.json
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
