@@ -7,57 +7,119 @@
 --           information into a predictor. It is the cleanest leakage trap in
 --           this dataset and I have left it out entirely.
 --
---           What IS safe: the account's age on the day of the question, and the
---           person's own track record on questions they had already asked.
--- Source:   posts_questions (full history, narrow columns only), users
--- Output:   so_analysis.asker_history — one row per question in the cohort
+--           What IS safe: the account's age on the day of the question, the
+--           person's own record on questions they had already asked, and how
+--           much they had already answered for other people.
+-- Source:   posts_questions (full history, four narrow columns), users
+--           (two columns), so_analysis.answers, post_vote_dates, params
+-- Output:   so_analysis.asker_history — one row per cohort question whose
+--           asker's account still exists (a deleted account has no history to
+--           look up, and 31_post_quality_rates treats it as unknown, not as
+--           "no history")
 -- Cost:     see results/run_log.md
 --
--- The 90-day lag on prior history is deliberate. A question asked last week may
--- not have been accepted yet even if it eventually will be, so counting it as
--- "not accepted" would import the same censoring problem at the asker level.
--- Only questions asked at least 90 days earlier are counted, by which point
--- ~93% of eventual acceptances have happened (see 00_profiling/03).
+-- Leakage-free by construction, in two ways:
+--   * A prior question counts as "answered before" or "accepted before" only if
+--     that event is DATED before the new question was asked. The first version
+--     of this table read acceptance from the question's final state, so a prior
+--     question accepted the week after the new one — the classic "come back,
+--     accept the old answers, ask the new question" session — was counted as
+--     history. The dates from 13_build_post_vote_dates remove that.
+--   * Rates are computed over prior questions at least `settle_days` old, so a
+--     question asked last week is not counted as "never accepted" merely because
+--     nobody has had time yet. The plain count of prior questions has no such
+--     lag: it is a count of behaviour, not of outcomes.
 
 CREATE OR REPLACE TABLE `so_analysis.asker_history` AS
 
-WITH all_questions AS (
-  -- Full history is needed here: a 2022 asker's track record may start in 2010.
-  -- Only four narrow columns, so the scan stays cheap.
+WITH params AS (
   SELECT
-    q.id AS question_id,
-    q.owner_user_id,
-    DATE(q.creation_date) AS asked_on,
-    q.accepted_answer_id IS NOT NULL AS was_accepted
-  FROM `bigquery-public-data.stackoverflow.posts_questions` AS q
-  WHERE q.owner_user_id IS NOT NULL
+    p.settle_days
+  FROM `so_analysis.params` AS p
 ),
 
 cohort AS (
-  SELECT c.question_id, c.owner_user_id, c.asked_on
+  SELECT
+    c.question_id,
+    c.owner_user_id,
+    c.asked_on
   FROM `so_analysis.question_cohort` AS c
   WHERE c.owner_user_id IS NOT NULL
 ),
 
-prior_activity AS (
+-- Every question ever asked by anyone: a 2022 asker's record may start in 2010.
+all_questions AS (
+  SELECT
+    q.id AS question_id,
+    q.owner_user_id,
+    DATE(q.creation_date) AS asked_on,
+    q.accepted_answer_id
+  FROM `bigquery-public-data.stackoverflow.posts_questions` AS q
+  WHERE q.owner_user_id IS NOT NULL
+),
+
+first_answers AS (
+  SELECT
+    a.question_id,
+    MIN(a.answered_on) AS first_answer_on
+  FROM `so_analysis.answers` AS a
+  GROUP BY a.question_id
+),
+
+history AS (
+  SELECT
+    h.question_id,
+    h.owner_user_id,
+    h.asked_on,
+    fa.first_answer_on,
+    v.accepted_on
+  FROM all_questions AS h
+  LEFT JOIN first_answers AS fa
+    ON fa.question_id = h.question_id
+  LEFT JOIN `so_analysis.post_vote_dates` AS v
+    ON v.post_id = h.accepted_answer_id
+),
+
+prior_questions AS (
   SELECT
     c.question_id,
-    COUNT(h.question_id) AS prior_questions,
-    SAFE_DIVIDE(COUNTIF(h.was_accepted), COUNT(h.question_id)) AS prior_acceptance_rate
+    COUNTIF(h.question_id IS NOT NULL) AS prior_questions,
+    COUNTIF(h.asked_on <= DATE_SUB(c.asked_on, INTERVAL p.settle_days DAY)) AS prior_questions_settled,
+    COUNTIF(h.asked_on <= DATE_SUB(c.asked_on, INTERVAL p.settle_days DAY)
+            AND h.first_answer_on < c.asked_on) AS prior_answered_before,
+    COUNTIF(h.asked_on <= DATE_SUB(c.asked_on, INTERVAL p.settle_days DAY)
+            AND h.accepted_on < c.asked_on) AS prior_accepted_before
   FROM cohort AS c
-  LEFT JOIN all_questions AS h
+  CROSS JOIN params AS p
+  LEFT JOIN history AS h
     ON h.owner_user_id = c.owner_user_id
-   AND h.asked_on <= DATE_SUB(c.asked_on, INTERVAL 90 DAY)
+   AND h.asked_on < c.asked_on
+  GROUP BY c.question_id
+),
+
+prior_answers AS (
+  SELECT
+    c.question_id,
+    COUNTIF(a.answer_id IS NOT NULL) AS prior_answers_written
+  FROM cohort AS c
+  LEFT JOIN `so_analysis.answers` AS a
+    ON a.answerer_user_id = c.owner_user_id
+   AND a.answered_on < c.asked_on
   GROUP BY c.question_id
 )
 
 SELECT
   c.question_id,
   DATE_DIFF(c.asked_on, DATE(u.creation_date), DAY) AS asker_account_age_days,
-  pa.prior_questions,
-  pa.prior_acceptance_rate
+  pq.prior_questions,
+  pq.prior_questions_settled,
+  SAFE_DIVIDE(pq.prior_answered_before, pq.prior_questions_settled) AS prior_answer_rate,
+  SAFE_DIVIDE(pq.prior_accepted_before, pq.prior_questions_settled) AS prior_acceptance_rate,
+  pa.prior_answers_written
 FROM cohort AS c
 LEFT JOIN `bigquery-public-data.stackoverflow.users` AS u
   ON u.id = c.owner_user_id
-LEFT JOIN prior_activity AS pa
+LEFT JOIN prior_questions AS pq
+  ON pq.question_id = c.question_id
+LEFT JOIN prior_answers AS pa
   ON pa.question_id = c.question_id

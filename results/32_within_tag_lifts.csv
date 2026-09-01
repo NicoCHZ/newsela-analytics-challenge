@@ -1,0 +1,12 @@
+attribute,tags_compared,gap_all_questions,gap_ignoring_tag,gap_within_tag,share_surviving_within_tag,tags_where_attribute_is_worse,tags_where_attribute_is_better
+asker_first_question_ever,469,-0.1063,-0.1,-0.101,1.01,468,1
+asker_signed_up_same_day,425,-0.101,-0.0943,-0.0988,1.05,422,3
+body_contains_error_output,373,-0.0355,-0.0426,-0.0294,0.69,222,151
+body_contains_image,378,0.0293,0.0323,0.0269,0.83,80,298
+body_contains_link_other_than_image,462,-0.0158,-0.0182,-0.0088,0.48,226,236
+body_has_at_least_one_code_block,445,0.1343,0.1281,0.1137,0.89,3,442
+body_has_four_or_more_code_blocks,328,0.0748,0.0596,0.0597,1.0,28,300
+body_says_what_was_tried,467,0.0253,0.0251,0.0202,0.8,120,347
+body_states_expected_result,293,0.0875,0.0912,0.0612,0.67,36,257
+body_text_3000_chars_or_more,415,-0.0121,-0.0223,-0.0147,0.66,213,202
+body_text_under_300_chars,321,-0.0879,-0.0827,-0.0752,0.91,303,18

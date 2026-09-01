@@ -1,0 +1,24 @@
+list,rank_in_list,tag,n_questions,first_tag_share,only_tag_share,acceptance_rate_as_first_tag,acceptance_rate_as_later_tag,distinct_co_tags_per_100_questions
+highest_approval,0,(all 10 tags in this list),38324,0.1001,0.0258,0.516,0.5651,16.9
+highest_approval,1,awk,1122,0.2816,0.1337,0.6899,0.6538,27.7
+highest_approval,2,dplyr,3654,0.0203,0.0044,0.4865,0.6394,16.1
+highest_approval,3,sed,944,0.1239,0.0837,0.5983,0.6252,30.7
+highest_approval,4,tidyverse,1298,0.0123,0.0015,0.25,0.6209,32.0
+highest_approval,5,regex,6262,0.378,0.0979,0.5615,0.6203,23.2
+highest_approval,6,pandas-groupby,997,0.007,0.005,0.1429,0.6051,23.9
+highest_approval,7,beautifulsoup,2295,0.0153,0.0048,0.4,0.5584,16.4
+highest_approval,8,group-by,1674,0.0376,0.0018,0.254,0.5673,35.2
+highest_approval,9,google-sheets-formula,1521,0.071,0.0565,0.2685,0.5655,16.8
+highest_approval,10,dataframe,18557,0.0394,0.0013,0.3579,0.5257,10.5
+lowest_approval,0,(all 10 tags in this list),17493,0.1937,0.0246,0.1136,0.1428,51.0
+lowest_approval,1,google-chrome-extension,1792,0.2137,0.067,0.0836,0.1263,36.3
+lowest_approval,2,browser,1069,0.1057,0.0103,0.0708,0.1213,85.5
+lowest_approval,3,webview,896,0.0357,0.0033,0.0938,0.1169,60.4
+lowest_approval,4,sharepoint,1140,0.4018,0.0456,0.1245,0.1261,53.0
+lowest_approval,5,google-chrome,2842,0.2882,0.0229,0.094,0.1518,48.1
+lowest_approval,6,firebase-cloud-messaging,978,0.0378,0.0174,0.0541,0.136,34.0
+lowest_approval,7,proxy,1057,0.1277,0.0161,0.0815,0.1432,80.0
+lowest_approval,8,websocket,2251,0.1097,0.0084,0.1377,0.1477,53.7
+lowest_approval,9,webpack,3191,0.1802,0.0351,0.1235,0.1586,33.3
+lowest_approval,10,ssl,2277,0.2587,0.0061,0.1528,0.1511,61.4
+other_eligible,0,(all 450 tags in this list),2174972,0.4725,0.0447,0.3046,0.3136,24.3
