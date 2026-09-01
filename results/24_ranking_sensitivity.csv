@@ -1,0 +1,12 @@
+variant,eligible_tags,tags_eligible_in_both,rank_correlation_with_primary,top10_still_eligible,top10_retained,bottom10_still_eligible,bottom10_retained,new_entrants_at_the_top,new_entrants_at_the_bottom
+"primary: current year, 30-day window, derived floor, Wilson bound",470,470,1.0,10,10,10,10,,
+lifetime outcomes instead of the 30-day window,470,470,0.998,10,9,10,7,julia,iframe audio installation
+"previous year, months not yet purged by the site (Oct-Dec)",181,181,0.966,4,4,3,3,tsql dictionary pandas ggplot2 list rust,heroku npm jupyter-notebook jenkins android-studio pdf nginx
+"previous year, months already purged (Jan-Sep): a survivor population",477,441,0.929,10,8,6,3,aggregation-framework c++20,eclipse installation iis anaconda heroku google-colaboratory server
+looser floor: 5-point precision instead of 3,1233,470,1.0,10,5,10,1,jq purrr data.table tidyr data-manipulation,magento2 ckeditor facebook instagram appium facebook-graph-api cpanel elementor usb
+"stricter floor: 2,000 questions",210,210,1.0,4,4,4,4,ggplot2 dictionary rust pandas list string,heroku jenkins nginx npm graphql pdf
+rank on the observed rate instead of a confidence bound,470,470,0.997,10,9,10,8,c++20,plugins iframe
+"""approved"" = an answer the community upvoted within the window",470,470,0.943,10,5,10,5,haskell julia c++20 c++17 pointers,plugins socket.io heroku iis iframe
+"""rate of approved answers"" per answer written, not per question",470,470,0.526,10,0,10,1,shiny seaborn opengl plotly pyqt5 aggregation-framework ggplot2 rust d3.js matplotlib,flutter-dependencies outlook awk while-loop npm installation android-studio jmeter sed
+excluding answers the asker wrote themselves,470,470,0.989,10,10,10,9,,iis
+excluding questions closed within the window,470,470,0.998,10,9,10,9,c++20,plugins
