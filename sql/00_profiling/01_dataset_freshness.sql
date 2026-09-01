@@ -9,7 +9,7 @@
 --           filter reduces nothing and which columns you touch is the only
 --           lever (see the README's cost section).
 -- Source:   bigquery-public-data.stackoverflow.__TABLES__ and
---           INFORMATION_SCHEMA.COLUMNS — metadata, not table data
+--           INFORMATION_SCHEMA.COLUMNS (metadata, not table data)
 -- Grain:    one row per table in the dataset
 -- Cost:     see results/run_log.md (metadata only)
 --

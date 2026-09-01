@@ -7,14 +7,14 @@
 --           can be measured inside an identical window, and adds what
 --           moderation did to the question in that same window.
 -- Source:   so_analysis.question_cohort, answers, post_vote_dates,
---           question_moderation, params — no public table is read here
--- Output:   so_analysis.question_outcomes — one row per question in the cohort
+--           question_moderation, params (no public table is read here)
+-- Output:   so_analysis.question_outcomes (one row per question in the cohort)
 -- Cost:     see results/run_log.md (megabytes)
 --
 -- Timing resolution: vote dates are date-only (13_build_post_vote_dates), so
 -- everything here is computed in whole calendar days. Mixing a midnight vote
 -- stamp with the question's full timestamp would make every same-day
--- acceptance — 43% of them — look like it happened before the question.
+-- acceptance (43% of them) look like it happened before the question.
 --
 -- Every window flag is COALESCEd to FALSE so that "no answer" and "not within
 -- the window" behave identically in COUNTIF and in comparisons downstream.

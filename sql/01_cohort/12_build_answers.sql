@@ -1,14 +1,14 @@
 -- Cohort 3/7: the narrow answer table, read from the source exactly once.
 --
--- Purpose:  Three later steps need answers — the per-question outcomes, the
---           per-tag answerer supply, and each asker's own answering history —
---           and the last of those needs the full history back to 2008, because a
+-- Purpose:  Three later steps need answers: the per-question outcomes, the
+--           per-tag answerer supply, and each asker's own answering history.
+--           The last of those needs the full history back to 2008, because a
 --           2022 asker may have been answering since 2010. Since these public
 --           tables are not partitioned, a date filter would not reduce the bytes
 --           anyway, so the whole table is read once, five narrow columns, and
 --           materialized. `body` is never touched.
 -- Source:   bigquery-public-data.stackoverflow.posts_answers
--- Output:   so_analysis.answers — one row per answer, all years
+-- Output:   so_analysis.answers (one row per answer, all years)
 -- Cost:     see results/run_log.md
 --
 -- `lifetime_score` is the score at the time of the dump, not at any earlier

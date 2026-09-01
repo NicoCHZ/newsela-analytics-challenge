@@ -48,7 +48,7 @@
 -- Caveat, stated up front: people who post in both a high- and a low-approval
 -- tag are more experienced and more polyglot by construction. This identifies
 -- the effect among them, not among everyone, and it cannot be extrapolated to
--- one-time askers — who are exactly the population Hypothesis B is about. It
+-- one-time askers, who are exactly the population Hypothesis B is about. It
 -- is a directional test, not a verdict.
 
 WITH params AS (
@@ -132,7 +132,7 @@ tag_groups AS (
 
 -- Evaluation half. A question is assigned to a group only if it touches that
 -- group and not the other. Questions carrying both a high and a low tag are
--- genuinely ambiguous and are dropped rather than arbitrarily assigned.
+-- ambiguous and are dropped rather than arbitrarily assigned.
 question_group AS (
   SELECT
     qt.question_id,
@@ -204,7 +204,7 @@ dual_askers AS (
     AND pa.n_low > 0
 ),
 
--- Comparison 2: the same people, but NOT paired — question-weighted rates.
+-- Comparison 2: the same people, but NOT paired: question-weighted rates.
 dual_unpaired AS (
   SELECT
     COUNT(*) AS n_askers,

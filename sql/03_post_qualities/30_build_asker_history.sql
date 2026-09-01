@@ -1,6 +1,6 @@
 -- Prompt 2, step 1: what did we know about the ASKER before they posted?
 --
--- Purpose:  The most tempting asker attribute is `users.reputation` — and it is
+-- Purpose:  The most tempting asker attribute is `users.reputation`, and it is
 --           unusable. That column is a snapshot taken when the dump was built in
 --           late 2022, not the reputation the person had when they asked. Using
 --           it to explain a January 2022 outcome pours ten months of future
@@ -12,7 +12,7 @@
 --           much they had already answered for other people.
 -- Source:   posts_questions (full history, four narrow columns), users
 --           (two columns), so_analysis.answers, post_vote_dates, params
--- Output:   so_analysis.asker_history — one row per cohort question whose
+-- Output:   so_analysis.asker_history: one row per cohort question whose
 --           asker's account still exists (a deleted account has no history to
 --           look up, and 31_post_quality_rates treats it as unknown, not as
 --           "no history")
@@ -22,8 +22,8 @@
 --   * A prior question counts as "answered before" or "accepted before" only if
 --     that event is DATED before the new question was asked. The first version
 --     of this table read acceptance from the question's final state, so a prior
---     question accepted the week after the new one — the classic "come back,
---     accept the old answers, ask the new question" session — was counted as
+--     question accepted the week after the new one (the classic "come back,
+--     accept the old answers, ask the new question" session) was counted as
 --     history. The dates from 13_build_post_vote_dates remove that.
 --   * Rates are computed over prior questions at least `settle_days` old, so a
 --     question asked last week is not counted as "never accepted" merely because

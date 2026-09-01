@@ -16,7 +16,7 @@
 --
 -- Reading the columns:
 --   gap_all_questions   the difference in acceptance rate with and without the
---                       attribute, each question counted once — what 31 shows.
+--                       attribute, each question counted once (what 31 shows).
 --   gap_ignoring_tag    the same difference on the (question, tag) pairs that
 --                       enter the within-tag comparison, so that the next column
 --                       is compared against a like-for-like base.

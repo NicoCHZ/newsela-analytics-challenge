@@ -5,14 +5,14 @@
 --           literals, so a refreshed source moves every boundary at once and
 --           no number is buried in the middle of a query.
 -- Source:   bigquery-public-data.stackoverflow.posts_questions (creation_date only)
--- Output:   so_analysis.params — exactly one row
+-- Output:   so_analysis.params (exactly one row)
 -- Cost:     see results/run_log.md (one narrow column)
 --
 -- Derived from the data:
 --   snapshot_date     the newest question in the data: the dataset's own "today".
 --   cohort_end        snapshot minus the maturation window, so every question in
 --                     the cohort has had the same minimum observable exposure.
---   cohort_start      1 January of cohort_end's year — "the current year" as the
+--   cohort_start      1 January of cohort_end's year: "the current year" as the
 --                     data defines it.
 --   comparison_start  one year earlier. The previous year is kept for comparisons.
 --   purge_boundary    snapshot minus 365 days. Stack Overflow automatically
@@ -21,16 +21,16 @@
 --                     posts, so questions asked before this date are a survivor
 --                     population. See 00_profiling/02 and the README.
 -- Chosen, and justified where they are used:
---   maturation_days   30 — captures ~89% of eventual acceptances (04_validation/41).
---   settle_days       90 — how old a prior question must be before its outcome
+--   maturation_days   30: captures ~89% of eventual acceptances (04_validation/41).
+--   settle_days       90: how old a prior question must be before its outcome
 --                     counts in an asker's track record (~93% of acceptances by then).
---   z                 1.96 — 95% intervals.
---   target_precision  ±3 points — the resolution at which I would tell someone
+--   z                 1.96: 95% intervals.
+--   target_precision  ±3 points: the resolution at which I would tell someone
 --                     two tags differ; it sets the volume floor (02_tag_approval/20).
---   loose_precision   ±5 points — the looser floor used in the sensitivity check.
---   high_floor        2,000 questions — the stricter floor used in the same check.
---   min_per_side      100 — the smallest group compared inside a single tag.
---   group_size        50 — tags per side in the within-asker test.
+--   loose_precision   ±5 points: the looser floor used in the sensitivity check.
+--   high_floor        2,000 questions: the stricter floor used in the same check.
+--   min_per_side      100: the smallest group compared inside a single tag.
+--   group_size        50: tags per side in the within-asker test.
 
 CREATE OR REPLACE TABLE `so_analysis.params` AS
 

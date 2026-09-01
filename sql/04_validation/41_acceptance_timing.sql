@@ -9,8 +9,8 @@
 --           (b) How long does acceptance take? The maturation window in
 --               so_analysis.params has to be justified by the latency
 --               distribution, not picked by feel. The distribution is measured
---               on a fully matured cohort — the calendar year three years before
---               the snapshot — so it is not itself censored.
+--               on a fully matured cohort (the calendar year three years before
+--               the snapshot), so it is not itself censored.
 -- Source:   posts_questions (two narrow columns, one year), so_analysis
 --           post_vote_dates, question_cohort, question_outcomes, params
 -- Grain:    one row (a summary)

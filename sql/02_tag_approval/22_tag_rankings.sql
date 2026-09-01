@@ -7,7 +7,7 @@
 --
 -- Two ranking decisions:
 --
--- 1. THE VOLUME FLOOR is derived, not chosen — see 20_build_ranking_params.
+-- 1. THE VOLUME FLOOR is derived, not chosen; see 20_build_ranking_params.
 --    Without it the top of the list belongs to tags with five questions.
 --
 -- 2. RANK BY THE INTERVAL BOUND, NOT THE POINT ESTIMATE, and flip which bound

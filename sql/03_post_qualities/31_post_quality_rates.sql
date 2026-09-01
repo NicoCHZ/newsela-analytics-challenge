@@ -1,7 +1,7 @@
 -- Prompt 2: which qualities of a post go with getting answered, and accepted?
 --
 -- Purpose:  Measure how each attribute of a question relates to the two outcomes
---           the prompt asks about, and — more importantly — sort the attributes
+--           the prompt asks about, and, more importantly, sort the attributes
 --           into the ones that could actually inform advice and the ones that
 --           cannot.
 -- Source:   so_analysis.question_cohort, question_outcomes, asker_history,
@@ -30,7 +30,7 @@
 -- A null `owner_user_id` looks like an anonymous asker; it is a deleted account
 -- (the README explains why), which is a future event. Those rows are excluded
 -- from EVERY asker-history bucket, consistently, rather than landing in "no
--- prior history" — 9,883 rows with a 43% acceptance rate would otherwise
+-- prior history"; 9,883 rows with a 43% acceptance rate would otherwise
 -- contaminate that bucket.
 --
 -- Why buckets rather than a correlation coefficient: several of these
@@ -39,8 +39,8 @@
 -- strong inverted-U, which is exactly the shape most likely to be interesting.
 --
 -- `acceptance_given_answered` is reported next to the two rates because the
--- two can move in opposite directions — the negative-score bucket is the case
--- in point — and the funnel is what tells the two stories apart.
+-- two can move in opposite directions (the negative-score bucket is the case
+-- in point), and the funnel is what tells the two stories apart.
 
 WITH narrowest_tag AS (
   -- How niche is the most specific tag on the question? A question carrying

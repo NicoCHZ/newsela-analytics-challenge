@@ -8,8 +8,8 @@
 --           leakage-free (03_post_qualities/30). The votes table is read once
 --           here and never again.
 -- Source:   bigquery-public-data.stackoverflow.votes, so_analysis.params
--- Output:   so_analysis.post_vote_dates — one row per post that received either
---           vote type
+-- Output:   so_analysis.post_vote_dates (one row per post that received either
+--           vote type)
 -- Cost:     see results/run_log.md
 --
 -- Two things to know about `votes.creation_date`:
@@ -19,8 +19,8 @@
 --   * Acceptance dates are kept for every year, because prior questions of a
 --     2022 asker can be arbitrarily old. Upvote dates are only needed for
 --     answers to cohort questions, so they are kept from comparison_start on.
---     (This does not save bytes — the table is not partitioned — it keeps the
---     output small.)
+--     (This does not save bytes, since the table is not partitioned; it keeps
+--     the output small.)
 
 CREATE OR REPLACE TABLE `so_analysis.post_vote_dates` AS
 SELECT

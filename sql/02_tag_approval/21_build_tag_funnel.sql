@@ -8,12 +8,12 @@
 --           like: moderation (closed, duplicate) and answerer supply (how fast
 --           the first answer arrives, how many people answer at all).
 -- Source:   so_analysis.question_cohort, question_outcomes, answers, params
--- Output:   so_analysis.tag_funnel — one row per (cohort_region, tag)
+-- Output:   so_analysis.tag_funnel: one row per (cohort_region, tag)
 -- Cost:     see results/run_log.md (reads only the materialized tables)
 --
 -- Two things this table deliberately does NOT do:
 --   * It does not apply a volume floor. The floor is a presentation decision and
---     belongs in the query that ranks, not in the table that measures — that way
+--     belongs in the query that ranks, not in the table that measures. That way
 --     the sensitivity analysis can vary it without a rebuild.
 --   * It does not claim tags are independent. A question carries up to five tags
 --     and is counted once under each, so these are MARGINAL rates. The number of

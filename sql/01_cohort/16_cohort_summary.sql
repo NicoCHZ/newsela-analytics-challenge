@@ -1,7 +1,7 @@
 -- Cohort 7/7: every baseline figure quoted in the README.
 --
 -- Purpose:  The README claims each of its numbers is reproducible. The tag and
---           attribute tables cover most of them; this covers the rest — cohort
+--           attribute tables cover most of them; this covers the rest: cohort
 --           size and boundaries, the funnel baselines, how often moderation
 --           intervenes, and the figures used to argue that acceptance is one
 --           person's judgement rather than the community's.

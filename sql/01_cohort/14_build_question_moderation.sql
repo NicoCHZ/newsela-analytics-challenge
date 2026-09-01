@@ -1,4 +1,4 @@
--- Cohort 5/7: what moderation did to each question — closed, reopened, or
+-- Cohort 5/7: what moderation did to each question: closed, reopened, or
 -- marked as a duplicate.
 --
 -- Purpose:  A question with no answer is not one thing. It may have been hard,
@@ -8,12 +8,12 @@
 --           question table in this dataset has no closed_date column; the
 --           events live in post_history (type 10 = closed, 11 = reopened) and
 --           duplicate links in post_links (link_type_id = 3).
--- Source:   bigquery-public-data.stackoverflow.post_history — narrow columns
---           only. Its `text` column holds a full post revision per row and is
+-- Source:   bigquery-public-data.stackoverflow.post_history (narrow columns
+--           only). Its `text` column holds a full post revision per row and is
 --           what makes the table 113 GB; it is never read. post_links,
 --           so_analysis.question_cohort, so_analysis.params
--- Output:   so_analysis.question_moderation — one row per cohort question that
---           was ever closed, reopened, or linked as a duplicate
+-- Output:   so_analysis.question_moderation (one row per cohort question that
+--           was ever closed, reopened, or linked as a duplicate)
 -- Cost:     see results/run_log.md (the same query with the close-reason text
 --           would read 104 GB; this one reads about 3.5)
 

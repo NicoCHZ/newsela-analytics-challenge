@@ -4,7 +4,7 @@
 --           slice of time counts as "current", whether outcomes are measured in
 --           a fixed window or over the question's whole life, how many
 --           questions a tag needs to qualify, whether to rank on the observed
---           rate or on a confidence bound — and, above all, what "approved
+--           rate or on a confidence bound, and, above all, what "approved
 --           answer" means. Each is defensible. None is forced.
 --
 --           This query re-runs the ranking with one choice changed at a time.
@@ -14,11 +14,11 @@
 --
 -- HOW STABILITY IS MEASURED, and why "how many of the top ten survive" is not
 -- enough on its own. Raising the floor to 2,000 questions removes six of the
--- primary top ten BY DEFINITION — they have fewer than 2,000 questions — and a
+-- primary top ten BY DEFINITION (they have fewer than 2,000 questions), and a
 -- count of survivors would report that as instability when nothing about the
 -- ranking moved. So every variant reports:
 --   * how many of the primary top/bottom ten are still ELIGIBLE under the
---     variant, and how many of those are retained — retained is to be read
+--     variant, and how many of those are retained; retained is to be read
 --     against eligible, not against ten;
 --   * the rank correlation between the variant and the primary ranking over
 --     the tags eligible under both (Spearman, computed as the correlation of
@@ -31,7 +31,7 @@
 -- have already had their unanswered, non-positive-score questions deleted by
 -- the site (see 00_profiling/02); they are a survivor population, and their row
 -- is here to show what that does to a ranking. The October-December months are
--- the honest out-of-window comparison.
+-- the clean out-of-window comparison.
 
 WITH params AS (
   SELECT

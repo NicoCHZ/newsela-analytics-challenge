@@ -6,21 +6,21 @@
 --           roughly three quarters of the source table's bytes. Everything
 --           downstream reads this narrow table instead.
 -- Source:   bigquery-public-data.stackoverflow.posts_questions, so_analysis.params
--- Output:   so_analysis.question_cohort — one row per question
+-- Output:   so_analysis.question_cohort (one row per question)
 -- Cost:     see results/run_log.md (this is the expensive one, by design, once)
 --
 -- Window:   from comparison_start (1 January of the previous year) to cohort_end
 --           (the snapshot minus the maturation window). Both come from
 --           so_analysis.params, so nothing here is hardcoded. Each question is
 --           labelled with the region it falls in:
---             current_year        — the analysis cohort
---             prior_year_unpurged — the previous year, less than 365 days old at
---                                   the snapshot: not yet touched by the site's
---                                   automatic deletion of old unanswered questions
---             prior_year_purged   — the previous year, already a survivor population
+--             current_year:        the analysis cohort
+--             prior_year_unpurged: the previous year, less than 365 days old at
+--                                  the snapshot, so not yet touched by the site's
+--                                  automatic deletion of old unanswered questions
+--             prior_year_purged:   the previous year, already a survivor population
 --
 -- Text features, and what each one actually measures:
---   code_block_count      <pre><code> blocks — real code, not the inline <code>
+--   code_block_count      <pre><code> blocks: real code, not the inline <code>
 --                         spans a sentence uses for an identifier
 --   inline_code_count     the spans, kept separately
 --   body_text_length      length with HTML tags stripped, so a post full of
@@ -39,7 +39,7 @@
 --                         the two things the site's own asking guidelines request
 --
 -- Columns prefixed `posthoc_` accumulate AFTER the question is posted. They are
--- carried for descriptive work only and must never be treated as predictors —
+-- carried for descriptive work only and must never be treated as predictors;
 -- see the taxonomy in 03_post_qualities/31 and the README.
 
 CREATE OR REPLACE TABLE `so_analysis.question_cohort` AS
@@ -110,8 +110,8 @@ SELECT
   -- Stack Overflow drops owner_user_id but KEEPS owner_display_name when an
   -- account is deleted; has_display_name lets 04_validation/40 assert that every
   -- such row still carries a name. A null user id therefore records an account
-  -- deletion that happened somewhere between the question and the dump — an
-  -- event in the future relative to the post — which is why it sits here.
+  -- deletion that happened somewhere between the question and the dump (an
+  -- event in the future relative to the post), which is why it sits here.
   q.owner_user_id IS NULL AS posthoc_asker_account_deleted,
   q.owner_display_name IS NOT NULL AS has_display_name
 FROM `bigquery-public-data.stackoverflow.posts_questions` AS q

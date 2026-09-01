@@ -1,9 +1,9 @@
 -- A fixed sample of what the "error output" detector actually matched.
 --
--- Purpose:  A regular expression is a claim about text, and the only honest
+-- Purpose:  A regular expression is a claim about text, and the only sure
 --           way to know its precision is to read what it caught. This pulls a
---           deterministic sample — every question whose id is a multiple of a
---           fixed number, in id order — so the same fifty rows come back on
+--           deterministic sample (every question whose id is a multiple of a
+--           fixed number, in id order), so the same fifty rows come back on
 --           every run and the README's hand count refers to something a reader
 --           can open.
 -- Source:   so_analysis.question_cohort

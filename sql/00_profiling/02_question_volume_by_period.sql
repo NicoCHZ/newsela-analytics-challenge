@@ -14,8 +14,8 @@
 --               questions with a non-positive score once they turn a year old,
 --               and the public dump excludes deleted posts. Months older than
 --               that are a survivor population, and the share of questions that
---               are still unanswered with a non-positive score — the population
---               the rule removes — is the fingerprint to look for.
+--               are still unanswered with a non-positive score (the population
+--               the rule removes) is the fingerprint to look for.
 -- Source:   bigquery-public-data.stackoverflow.posts_questions
 -- Grain:    one row per calendar month
 -- Cost:     see results/run_log.md (reads 4 narrow columns; never touches body)

@@ -1,5 +1,5 @@
--- Prompt 1a/1b, third explanation: are the low-approval tags simply the generic
--- ones — added in third or fourth position, describing a technology the
+-- Prompt 1a/1b, third explanation: are the low-approval tags just the generic
+-- ones, added in third or fourth position, describing a technology the
 -- question passes through rather than what it is about?
 --
 -- Purpose:  The bottom of the ranking is full of cross-cutting tags (browser,

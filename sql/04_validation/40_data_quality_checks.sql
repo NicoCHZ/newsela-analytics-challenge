@@ -22,7 +22,7 @@
 --     automatic removal of old unanswered questions: a step in the answer rate
 --     exactly a year before the snapshot, and almost no surviving question with
 --     a negative score and no answer. They are informational because the data
---     is behaving as the site's rules say it should — but any comparison across
+--     is behaving as the site's rules say it should, but any comparison across
 --     that boundary has to know about it.
 --   * "Accepted without an acceptance vote" is the referential check between
 --     the question's accepted_answer_id and the votes table, which every timing

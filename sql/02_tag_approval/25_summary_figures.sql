@@ -3,7 +3,7 @@
 --
 -- Purpose:  Two kinds of number that the ranking query does not produce:
 --           (a) how many tags there are, how many clear the floor, and how much
---               of the cohort they cover — the context for every "top ten";
+--               of the cohort they cover, the context for every "top ten";
 --           (b) how much of the spread in acceptance across tags comes from
 --               whether anyone answers at all, versus whether the asker comes
 --               back to accept once answered.

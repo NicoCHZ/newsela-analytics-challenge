@@ -5,13 +5,13 @@
 --           and a lucky streak (02_tag_approval/22 shows exactly that). The
 --           floor is the smallest sample that pins a tag's rate to within the
 --           target precision at 95% confidence, given the cohort's own base
---           rate — the standard sample size for a proportion:
+--           rate, which is the standard sample size for a proportion:
 --             n >= z^2 * p * (1 - p) / m^2
 --           It is computed once here and read by every query that ranks, so the
 --           sensitivity check can vary it without anyone editing a literal, and
 --           a refreshed dataset gets a floor that matches its own base rate.
 -- Source:   so_analysis.question_outcomes, so_analysis.params
--- Output:   so_analysis.ranking_params — exactly one row
+-- Output:   so_analysis.ranking_params (exactly one row)
 -- Cost:     see results/run_log.md
 
 CREATE OR REPLACE TABLE `so_analysis.ranking_params` AS
