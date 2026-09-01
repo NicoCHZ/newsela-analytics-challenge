@@ -2,7 +2,6 @@
 *.pdf
 
 # Credentials
-.env
 *.env
 service-account*.json
 *-key.json

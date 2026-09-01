@@ -1,0 +1,2 @@
+questions_in_cohort,cohort_start,cohort_end,snapshot_date,window_days,answer_rate,positive_answer_rate,acceptance_rate,acceptance_given_answered,answered_within_a_day_rate,median_days_to_first_answer,closed_in_window_share,duplicate_share,self_accepted_share,accepted_not_top_scored_share,upvoted_answer_never_accepted_share
+1125763,2022-01-01,2022-08-26,2022-09-25,30,0.6059,0.3067,0.2972,0.4905,0.5337,0,0.048,0.0372,0.124,0.1504,0.3225
