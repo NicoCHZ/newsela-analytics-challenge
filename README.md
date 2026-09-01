@@ -2,9 +2,10 @@
 
 Nicolás Chirino — analysis of `bigquery-public-data.stackoverflow`.
 
-Every number below is reproducible: the query that produced it is in `sql/`, and
-its output is committed in `results/` so you can check the figures without a
-Google Cloud project. `results/run_log.md` records what each query cost.
+Every number below is reproducible: the query that produced it is in `sql/`, its
+output is committed in `results/`, and the two are linked by name. You can check
+the figures without a Google Cloud project. `results/run_log.md` records what each
+query cost and the date it was run.
 
 ---
 
@@ -12,36 +13,43 @@ Google Cloud project. `results/run_log.md` records what each query cost.
 
 **A caveat that comes first, because it changes the question.** The prompt asks
 about "the current year". This dataset received its last question on
-**25 September 2022** and has not been refreshed since. Its newest row is 1,436
-days old. I therefore read "current year" as *current relative to the data*, and
-analyse **1,125,763 questions asked between 1 January and 26 August 2022** — 2022
-up to the point where outcomes are fully observable. The window boundary is
-computed from the data in every script, not hardcoded, so this all still works if
-the source is ever reloaded.
+**25 September 2022** and has not been refreshed since. I therefore read "current
+year" as *current relative to the data*, and analyse **1,125,763 questions asked
+between 1 January and 26 August 2022** — 2022 up to the point where every
+question has had the same 30 days in which to be answered and accepted. Every
+boundary is derived from the data (`sql/01_cohort/10_build_params.sql`), so the
+scripts do the right thing if the source is ever reloaded.
 
-**F1 — The tags with the highest and lowest rate of accepted answers.**
+**F1 — The tags with the highest and lowest rate of accepted answers.** Ranked by
+a 95% confidence bound, among the 470 tags with enough questions to pin their rate
+to ±3 points; sorted as the query ranks them.
 
 | Highest | n | accepted | 95% CI | | Lowest | n | accepted | 95% CI |
 |---|---:|---:|---|---|---|---:|---:|---|
-| `awk` | 1,122 | 66.4% | 63.6–69.1 | | `browser` | 1,069 | 11.6% | 9.8–13.7 |
-| `dplyr` | 3,654 | 63.6% | 62.1–65.2 | | `webview` | 896 | 11.6% | 9.7–13.9 |
-| `sed` | 944 | 62.2% | 59.1–65.2 | | `google-chrome-extension` | 1,792 | 11.7% | 10.3–13.3 |
+| `awk` | 1,122 | 66.4% | 63.6–69.1 | | `google-chrome-extension` | 1,792 | 11.7% | 10.3–13.3 |
+| `dplyr` | 3,654 | 63.6% | 62.1–65.2 | | `browser` | 1,069 | 11.6% | 9.8–13.7 |
+| `sed` | 944 | 62.2% | 59.1–65.2 | | `webview` | 896 | 11.6% | 9.7–13.9 |
 | `tidyverse` | 1,298 | 61.6% | 59.0–64.2 | | `sharepoint` | 1,140 | 12.5% | 10.8–14.6 |
-| `pandas-groupby` | 997 | 60.2% | 57.1–63.2 | | `firebase-cloud-messaging` | 978 | 13.3% | 11.3–15.6 |
 | `regex` | 6,262 | 59.8% | 58.6–61.0 | | `google-chrome` | 2,842 | 13.5% | 12.3–14.8 |
+| `pandas-groupby` | 997 | 60.2% | 57.1–63.2 | | `firebase-cloud-messaging` | 978 | 13.3% | 11.3–15.6 |
 | `beautifulsoup` | 2,295 | 55.6% | 53.6–57.6 | | `proxy` | 1,057 | 13.5% | 11.6–15.7 |
 | `group-by` | 1,674 | 55.6% | 53.2–57.9 | | `websocket` | 2,251 | 14.7% | 13.3–16.2 |
 | `google-sheets-formula` | 1,521 | 54.4% | 51.9–56.9 | | `webpack` | 3,191 | 15.2% | 14.0–16.5 |
 | `dataframe` | 18,557 | 51.9% | 51.2–52.6 | | `ssl` | 2,277 | 15.2% | 13.7–16.7 |
 
-Cohort baseline: 29.7%. **Confidence: high for the top list, moderate for the
-bottom** — see the sensitivity table in F3.
+Cohort baseline: 29.7%. The full 470-tag list, with everything measured about each
+tag, is in `results/26_eligible_tags.csv`.
 
 The shape is legible without any statistics. The top is **self-contained
 transformation problems**: here is my input, here is the output I want. A regex
 either matches or it does not. The bottom is **environment and integration
 problems**: browsers, platforms, proxies, TLS, build tooling — where the answer
-depends on a machine nobody else can see.
+depends on a machine nobody else can see. Two further columns say the same thing
+more sharply. A top-list question draws **1.2 to 2.5 answers**; a bottom-list question
+draws **0.3 to 0.5**. And when a bottom-list question *is* resolved, the accepted
+answer was written **by the asker themselves 17–48% of the time** (`webpack` 48%,
+`ssl` 42%, `proxy` 34%), against 1.5–2.8% at the top. In these tags, being solved
+mostly means solving it yourself.
 
 **F2 — The headline metric is a compound of two very different things.** Splitting
 it apart is the most useful thing in this analysis:
@@ -52,33 +60,84 @@ it apart is the most useful thing in this analysis:
 | `webpack` | 37.7% | 40.4% | 15.2% |
 | cohort | 60.6% | 49.1% | 29.7% |
 
-Decomposing the variance across the 473 ranked tags, **58% of the spread comes
-from whether anyone answers at all and 42% from whether the asker comes back to
-accept** (the two stages correlate at 0.63, so they are not independent). A tag
-can be low for two completely different reasons, and a single "approval rate"
-cannot tell you which.
+Across the 470 ranked tags, **58% of the spread in acceptance comes from whether
+anyone answers at all and 42% from what happens once somebody has** — with the
+two stages correlated at 0.63, so they are not independent
+(`results/25_summary_figures.csv`; the decomposition is exact in logarithms and
+splits the covariance evenly). The second stage is not simply "did the asker come
+back": it mixes whether the answers were any good with whether anyone returned to
+say so. The nearest thing to a pure follow-through figure is this: of the questions
+that had a community-upvoted answer within 30 days, **32% were never accepted by
+anyone**.
 
-**F3 — I can break most of my own bottom list.** Re-running the ranking with one
-methodological choice changed at a time (`results/23_ranking_sensitivity.csv`):
+**F3 — How much of the ranking is the method.** Re-running it with one choice
+changed at a time (`results/24_ranking_sensitivity.csv`). "Retained" is counted
+against the tags *still eligible* under the variant, because raising a floor
+removes small tags by definition, and that is not instability. The rank correlation
+is over the tags eligible under both.
 
-| change | top 10 retained | bottom 10 retained |
-|---|---:|---:|
-| lifetime outcomes instead of a 30-day window | 9 | 7 |
-| rank on observed rate instead of a confidence bound | 9 | 8 |
-| 2021 instead of 2022 | 6 | 4 |
-| volume floor 2,000 instead of 886 | 4 | 4 |
-| volume floor 322 instead of 886 | 5 | **1** |
+| change | eligible | rank corr. | top 10 retained | bottom 10 retained |
+|---|---:|---:|---:|---:|
+| lifetime outcomes instead of a 30-day window | 470 | 0.998 | 9 of 10 | 7 of 10 |
+| Oct–Dec 2021 instead of 2022 (the previous year's un-purged months) | 181 | 0.966 | 4 of 4 | 3 of 3 |
+| Jan–Sep 2021 (purged by the site; see Data quality) | 477 | 0.929 | 8 of 10 | 3 of 6 |
+| looser floor (5-point precision, 321 questions) | 1,233 | 1.000 | 5 of 10 | 1 of 10 |
+| stricter floor (2,000 questions) | 210 | 1.000 | 4 of 4 | 4 of 4 |
+| rank on the observed rate instead of a bound | 470 | 0.997 | 9 of 10 | 8 of 10 |
+| "approved" = an answer the community upvoted within 30 days | 470 | 0.943 | 5 of 10 | 5 of 10 |
+| "rate of approved answers" per answer written, not per question | 470 | **0.526** | **0 of 10** | 1 of 10 |
+| excluding answers the asker wrote themselves | 470 | 0.989 | 10 of 10 | 9 of 10 |
+| excluding questions closed within the window | 470 | 0.998 | 9 of 10 | 9 of 10 |
 
-The top list is stable against how I measure. **Both lists are sensitive to the
-volume floor, and the bottom list is barely stable at all** — drop the floor and
-nine of ten tags change. I would report the top list to a stakeholder. I would
-report the bottom list as a direction, not a list of names.
+Read together: **the ranking itself barely moves** — the correlation stays at 0.93
+or above under every change of window, floor, bound, year or moderation. What moves
+is *which ten names sit at the extremes* when the floor admits smaller tags: with
+the looser floor, nine of the bottom ten are displaced, but by `facebook-graph-api`,
+`magento2`, `cpanel`, `appium`, `elementor` and their like — the same kind of tag,
+with even worse rates. The bottom is a *tier*, not a list: fifteen eligible tags have an
+upper bound below 17%, every one of them a platform, integration or tooling tag,
+and the ten names above are simply the lowest ten of them. I would report the top list as a list and
+the bottom as a category.
+
+The one change that overturns everything is the **definition**. If "rate of
+approved answers" is read per answer written — accepted answers over answers —
+`awk` and `sed` fall to the *bottom*: they attract two or three answers per
+question, and only one can be accepted. That reading measures competition among
+answerers, not whether askers get helped; I explain below why I chose the
+per-question reading, but the choice is doing more work than any threshold.
 
 **F4 — For prompt 2, the strongest attribute known at post time is not about the
-question at all.** It is the asker's own track record: people whose earlier
-questions were usually accepted get accepted at **1.61× the baseline**, those who
-had never had one accepted at **0.62×**. The strongest attribute of the post
-itself is **code blocks** — none, 0.59×; nine or more, 1.34×.
+question at all.** It is the asker's own track record, measured only from events
+that had already happened when they posted: people whose earlier questions were
+usually accepted get accepted at **1.61× the baseline**, those with three or more
+settled prior questions and no acceptance ever at **0.52×**. Of the post itself, the
+strongest attributes are **code blocks** (none, 0.66×; two or three, 1.18×) and
+**stating what result you expected** (1.27×, and 1.11× on being answered at all).
+Both survive with the topic held constant (89% and 67% of the gap, respectively).
+
+**Implications, as hypotheses rather than recommendations.** If I were advising
+the site: (1) the submission form could ask for the expected result and a code
+block, since both are associated with better outcomes inside every topic; (2) a
+reminder to askers sitting on an upvoted, unaccepted answer targets the 32% of
+resolved questions that never close the loop; (3) questions in the bottom tier are
+mostly solved by their own askers, which argues for a different support path —
+diagnostics, environment capture — rather than more answerers. Each of these is a
+testable experiment, not a finding.
+
+---
+
+## Reading the prompt
+
+The prompt leaves five things open. Here is how I read each one, and what changes
+under the other reading.
+
+| phrase | reading used | alternative | what changes |
+|---|---|---|---|
+| "approved answers" | the asker accepted an answer (the green check) | an answer the community upvoted | 5 of the top 10 change (`haskell`, `julia`, `c++20` enter); rank correlation 0.94 |
+| "rate of approved answers" | per question: share of questions with an accepted answer | per answer: accepted answers over answers written | the ranking inverts (correlation 0.53); see F3 |
+| "the current year" | 2022 to 26 August, the last year in the data | the trailing twelve months, or the previous full year | the previous year is a survivor population (see Data quality); the trailing twelve months would straddle the boundary |
+| "lead to" | association; nothing here identifies a cause | — | see "On lead to" below |
+| "qualities on a post" | attributes of the post, plus attributes of the poster knowable at post time | the post alone | the asker's record is the strongest attribute and is labelled as the poster's, not the post's |
 
 ---
 
@@ -87,11 +146,13 @@ itself is **code blocks** — none, 0.59×; nine or more, 1.34×.
 ### The metric
 
 Stack Overflow has no "approved" answer. The closest thing is the green check the
-**asker** puts on one answer, and that is what I measure (`accepted_answer_id`).
-It is worth being explicit that this is one person's judgement, not the
-community's. Among accepted questions that actually had a choice to make — more
-than one answer — **15.0% accepted something other than the highest-scored
-answer**, and 12.4% of accepted answers were written by the asker themselves.
+**asker** puts on one answer, and that is what I measure (`accepted_answer_id`,
+dated through the acceptance vote in the votes table — every accepted question in
+the cohort has one). It is worth being explicit that this is one person's
+judgement, not the community's. Among accepted questions that actually had a
+choice to make — more than one answer — **15.0% accepted something other than the
+highest-scored answer**, and 12.4% of accepted answers were written by the asker
+themselves.
 
 **On "lead to".** The prompt asks which tags *lead to* higher approval. Nothing
 here can support that. Tags are chosen by the asker and describe what the question
@@ -99,54 +160,90 @@ already is — you cannot add `regex` to a Kubernetes question and see what happ
 The counterfactual is not just unidentified, it is incoherent. Everything above is
 association.
 
-### 1a. Two competing explanations
+### 1a. Competing explanations
 
-These are framed to predict *different* things, so the data can tell them apart.
+Three, framed so the data can tell them apart. Each predicts both funnel stages
+low in the bottom tags — for different reasons — so the funnel alone cannot
+separate them; the discriminating tests are the last two rows.
 
-| | **H1 — the problem is tractable** | **H2 — the people are different** |
-|---|---|---|
-| mechanism | some topics produce self-contained questions with a verifiable answer; others depend on an environment nobody can reproduce | acceptance requires the asker to return; some tags attract one-time askers who never do |
-| predicts: answer rate in low tags | low | normal |
-| predicts: acceptance given answered | normal | low |
-| predicts: same person across both kinds of tag | gap persists | gap collapses |
+| | **H1 — the problem is tractable** | **H2 — the people are different** | **H3 — the tag is a bystander** |
+|---|---|---|---|
+| mechanism | some topics produce self-contained questions with a verifiable answer; others depend on an environment nobody can reproduce | acceptance requires the asker to return; some tags attract one-time askers who never do | low tags are generic labels (`browser`, `proxy`) added to questions that are really about something else, so nobody who follows the tag can help |
+| why answering is low | nobody can reproduce the problem | novices write questions that get answered less | the question is not about the tag |
+| why acceptance given an answer is low | answers are plausible but unverifiable | the asker never comes back | same as H1 |
+| same person across both kinds of tag | gap persists | gap collapses | gap persists |
+| tag first vs tag trailing | no difference | no difference | the tag does fine when it leads |
 
 ### 1b. Why the low tags are low
 
-The bottom tags fail at **both** stages: `webpack` gets an answer 37.7% of the
-time against a 60.6% baseline, *and* converts at 40.4% against 49.1%. Browser and
-platform questions depend on a version, an extension set and an OS the answerer
-cannot see, so the same answer is right in one environment and wrong in another,
-and toolchain answers go stale faster than they get accepted. F2 says the
-answerability stage is the larger effect, though not overwhelmingly.
+The bottom tags fail at **both** stages: `webpack` gets an answer 37.7% of the time
+against a 60.6% baseline, *and* converts at 40.4% against 49.1%. Three things the
+funnel table adds (`results/22_tag_rankings.csv`):
 
-### 1c. Testing H2, and what happened
+- **It is not moderation.** I built the closure and duplicate events for every
+  question (`sql/01_cohort/14_build_question_moderation.sql`) expecting the bottom
+  tags to be full of questions closed within the hour. They are not: apart from
+  `google-chrome-extension` (14% closed, 14% linked as duplicates), the bottom tags
+  are closed 0.5–4% of the time. The *top* tags are closed more — `regex` 11%,
+  `sed` 11%, `awk` 10%, almost all as duplicates — and still get accepted.
+  Excluding closed questions changes nothing (F3).
+- **It is not a shortage of people.** Distinct answerers per hundred questions are
+  similar at both ends (17–56 at the top, 23–40 at the bottom). What differs is
+  how often anyone answers at all — 0.3–0.5 answers per question at the bottom
+  against 1.2–2.5 at the top — and who resolves it: the asker themselves, 17–48%
+  of the time.
+- **They are slower and the window costs them slightly more.** The 30-day window
+  captures 97–98% of the top tags' eventual acceptances and 84–91% of the bottom
+  tags'. Measuring over the questions' whole life moves three bottom names but
+  leaves the tier intact (F3).
 
-H2 is the more interesting claim — if true, tag approval rate is largely a
-measure of user retention wearing a topic as a costume. It is also partly
-testable here: **hold the person constant and let only the topic vary.**
+Browser and platform questions depend on a version, an extension set and an OS
+the answerer cannot see, so the same answer is right in one environment and wrong
+in another; the person who can finally see the problem is the asker, which is why
+they end up answering it. That is H1, with the self-answer share as its clearest
+fingerprint.
 
-I took the 7,580 askers who posted in both a top-50 and a bottom-50 tag during the
-window, and compared each person against themselves
-(`sql/02_tag_approval/22_within_asker_test.sql`):
+### 1c. Testing H2 and H3, and what happened
+
+**H2 — hold the person constant.** If tag approval is largely a measure of user
+retention wearing a topic as a costume, the gap should collapse when the same
+person asks in both kinds of tag. The test (`sql/02_tag_approval/23_within_asker_test.sql`)
+picks the 50 highest and 50 lowest tags on half the questions and measures on the
+other half, so choosing the extremes does not reward its own noise, and it
+weights each person's own difference by how many questions they have on each side,
+so it is comparable with the population gap:
 
 | comparison | gap |
 |---|---:|
-| between tag groups, whole population | 29.9 pp |
-| same, restricted to people who ask in both | 31.0 pp |
-| **within the same person** | **28.2 pp** (SE 0.6) |
+| between tag groups, whole evaluation half (130,839 questions) | 29.8 pp |
+| same, restricted to the 2,766 people who ask in both | 29.7 pp |
+| **within the same person** | **29.1 pp** (SE 1.0) |
+| within the same person, at the answering stage | 29.4 pp |
+| within the same person, at the acceptance-given-answered stage | 20.4 pp |
+| within the same person, people with at least two questions on each side (262) | 30.1 pp |
 
-**The gap survives.** 28 of 29.9 points remain when the same human being asks in
-both kinds of tag. On this evidence H2 is not the main story — the difference
-travels with the question, not the asker. That was not what I expected going in.
+**The gap survives intact.** The same human being is answered 29 points less often
+and, once answered, accepts 20 points less often in the low tags. On this evidence
+the composition version of H2 — different people in different tags — is not
+supported among repeat askers. The honest limit: people who ask across both worlds
+are more experienced than average by construction, so this says little about the
+one-time askers H2 is really about, and it cannot separate "the problem was not
+solvable" from "the answer arrived too late for this person to care", which would
+look identical here.
 
-What I would still need: close reasons and dates (to separate "nobody answered"
-from "closed as a duplicate"); whether the asker returned to the site at all;
-deleted questions, which this dataset omits entirely; and ideally a nudge
-experiment — prompt askers sitting on a good unaccepted answer, and see whether
-acceptance rises evenly across tags (H2) or only where good answers already exist
-(H1). The honest limit of my test is that people who ask
-across both worlds are more experienced than average by construction, so it says
-little about the one-time askers H2 is really about.
+**H3 — does the tag do better when it leads?** No (`results/33_tag_position.csv`).
+The bottom tags are *more* often the first tag on their questions than the top
+tags are (19% against 10%), and they do *worse* when they lead: 11.4% accepted as
+the first tag against 14.3% when trailing. What is true is that they keep very
+mixed company — 51 distinct co-tags per hundred questions against 17 at the top —
+which fits H1's picture of integration problems spanning several technologies
+better than the bystander story. H3 is rejected as stated.
+
+**What I would still need.** Whether the asker returned to the site at all after
+posting (the users table has no last-seen date); deleted questions, which this
+dataset omits entirely; and ideally a nudge experiment — prompt askers sitting on
+an upvoted unaccepted answer, and see whether acceptance rises evenly across tags
+(H2) or only where the answer was verifiable (H1).
 
 ---
 
@@ -156,187 +253,282 @@ little about the one-time askers H2 is really about.
 one of two groups, and only one of them can support advice:
 
 - **Known at post time** — true the moment you hit submit. Actionable.
-- **Post hoc** — accumulates afterwards. `score`, `view_count`, `comment_count`.
-  These correlate beautifully and explain nothing.
-
-The clearest illustration is in the data: questions with a **negative** score have
-the **highest answer rate of any bucket in this analysis — 98.5%**. Downvotes do
-not attract answers. Attention produces both.
+- **Post hoc** — accumulates afterwards. `score`, `view_count`, `comment_count`,
+  whether the account was later deleted. These correlate beautifully and explain
+  nothing.
 
 Selected results (full table in `results/31_post_quality_rates.csv`; lift is
-relative to the cohort baseline, and `share` is what fraction of questions the
-bucket covers — a large lift on a rare attribute is a curiosity, not a lever):
+relative to the cohort baseline, `share` is what fraction of questions the bucket
+covers, and the last column is how much of the effect survives when questions
+with and without the attribute are compared *inside the same tag*, from
+`results/32_within_tag_lifts.csv`). A large lift on a rare attribute is a
+curiosity, not a lever.
 
-| attribute (known at post time) | bucket | share | answer lift | acceptance lift |
-|---|---|---:|---:|---:|
-| asker's prior acceptance rate | never accepted before | 11% | 0.92 | **0.62** |
-| | usually accepted | 10% | 1.15 | **1.61** |
-| code blocks in body | none | 20% | 0.81 | **0.59** |
-| | 9 or more | 5% | 1.09 | **1.34** |
-| asker's prior questions | none | 41% | 0.97 | 0.86 |
-| | 100 or more | 6% | 1.09 | 1.29 |
-| account age at post | same day as signup | 13% | 0.91 | 0.70 |
-| body length | under 300 chars | 6% | 0.92 | 0.65 |
-| | 1,500–2,999 chars | 24% | 1.02 | **1.09** |
-| | 3,000+ chars | 14% | 0.95 | 1.00 |
-| title ends with "?" | yes | 23% | 1.05 | 1.07 |
-| title contains "urgent"/"help me" | yes | **0.06%** | 0.99 | 0.73 |
-| body contains an error or stack trace | yes | 18% | 0.93 | 0.90 |
-| number of tags | 2 | 25% | 1.03 | 1.05 |
-| | 5 | 16% | 0.96 | 0.95 |
+| attribute (known at post time) | bucket | share | answer lift | acceptance lift | survives within tag |
+|---|---|---:|---:|---:|---:|
+| asker's prior acceptance rate (≥ 3 settled prior questions) | never accepted before | 3% | 0.92 | **0.52** | |
+| | most of the time | 10% | 1.15 | **1.61** | |
+| asker's prior questions | none — first question ever | 26% | 0.92 | **0.73** | 100% |
+| | 100 or more | 7% | 1.09 | 1.31 | |
+| asker's prior answers written | none | 54% | 0.97 | 0.86 | |
+| | 100 or more | 3% | 1.11 | 1.33 | |
+| account age at post | same day as signup | 13% | 0.91 | **0.70** | 100% |
+| code blocks in body | none | 25% | 0.84 | **0.66** | 89% |
+| | 2–3 | 33% | 1.08 | 1.18 | |
+| inline code spans | none | 70% | 0.97 | 0.91 | |
+| | 10 or more | 2% | 1.08 | 1.31 | |
+| body states the expected result | yes | 7% | **1.11** | **1.27** | 67% |
+| body says what was tried | yes | 15% | 1.02 | 1.07 | 80% |
+| body text (tags stripped) | under 300 chars | 10% | 0.95 | **0.73** | 91% |
+| | 700–1,499 | 32% | 1.04 | 1.09 | |
+| | 3,000 or more | 12% | 0.94 | 0.96 | 66% |
+| title form | "how …" | 22% | 1.06 | 1.06 | |
+| | "why …" | 3% | 1.05 | 1.11 | |
+| | problem report ("… not working", "… error") | 15% | **0.88** | **0.78** | |
+| title ends with "?" | yes | 23% | 1.05 | 1.07 | |
+| title contains "urgent" / "help me" | yes | 0.06% | 0.99 | 0.73 | |
+| body contains an error message or stack trace | yes | 12% | 0.93 | 0.90 | 69% |
+| body contains an image | yes | 12% | 1.03 | 1.09 | 83% |
+| body contains a link (other than an image) | yes | 20% | 0.93 | 0.96 | 48% |
+| number of tags | 2 | 25% | 1.03 | 1.05 | |
+| | 5 | 16% | 0.96 | 0.95 | |
+| narrowest tag on the question | under 1,000 questions this year | 64% | 0.93 | 0.91 | |
+| | only mega-tags (100,000+) | 2% | 1.24 | 1.26 | |
+| posting time (UTC) | 20:00–23:59 | 13% | 1.03 | 1.06 | |
+| | 04:00–07:59 | 13% | 0.99 | 0.95 | |
+| posting day | Saturday or Sunday | 18% | 1.04 | 1.07 | |
 
-Three things worth pulling out.
+Five things worth pulling out.
 
-**Body length is an inverted U.** Under 300 characters scores 0.65; the peak is
-1,500–2,999 at 1.09; past 3,000 it falls back to 1.00. This is why I report
-bucketed rates rather than correlation coefficients — a single coefficient would
-have called this "no relationship". The same shape appears in title length.
+**Saying what you expected is the most actionable thing in the table.** Seven
+percent of questions state an expected output or result, and they are answered 11%
+more often and accepted 27% more often; two thirds of that survives with the topic
+fixed, and the direction holds in 257 of the 293 tags where it can be tested.
+Saying what you *tried* helps less than the site's own guidance would suggest
+(1.07×). Neither is a large share of questions, which is what makes them levers
+rather than descriptions.
+
+**Body length is an inverted U.** Measured on the text with the HTML stripped —
+markup and image links would otherwise count as length — under 300 characters
+scores 0.73, the peak is 700–1,499 at 1.09, and past 3,000 it falls back to 0.96. Title length is
+not the same shape: it is flat until 85 characters and then falls (0.90).
+
+**A title that reports a problem does worse than a title that asks a question.**
+Titles of the form "X not working" or "error doing Y" are 15% of the cohort and
+are answered 12% and accepted 22% less often than average; "how" and "why" titles
+do modestly better. This is the closest thing here to a writing rule.
 
 **Pasting an error message is associated with *lower* acceptance (0.90), not
-higher.** I expected the opposite: an error message reads like a specific,
-reproducible problem. My first explanation was that error text merely marks the
-environment-dependent topics that already rank badly in prompt 1 — in which case
-the attribute would be telling us nothing the tag had not. That explanation is
-mostly wrong. Comparing questions with and without error text *inside the same
-tag* across 421 tags, the gap goes from 3.3 points to 2.7
-(`sql/03_post_qualities/32_error_text_within_tag.sql`): **82% of it survives with
-the topic held constant.** It is also not a universal rule — error text goes with
-worse acceptance in 246 of those tags and better in 175. A modest real effect with
-genuine heterogeneity, not a law.
+higher.** I expected the opposite. The first version of this detector fired on the
+word "exception", which every try/catch block contains; the current one is
+anchored on what runtime output looks like (a Python traceback, a JVM stack frame,
+`SomethingError:`, a compiler `error C1234:`), and in the fixed sample of fifty
+matches in `results/42_error_signature_sample.csv`, 42 are genuine runtime output
+and 8 are code that handles or names errors. With the topic held constant, 69% of
+the gap survives, but the direction is not universal — error text goes with worse
+acceptance in 222 tags and better in 151. A modest, heterogeneous effect, not a
+law; my reading is that an error message marks a question the asker could not
+diagnose themselves, and those are the ones nobody else can diagnose either.
 
-**Question comment count has essentially no relationship with either outcome**
-(every bucket between 0.92 and 1.06). I had expected comments to signal an unclear
-question and predict worse outcomes. They do not, and I am reporting that rather
-than dropping it.
+**Niche tags do not help.** I expected a question carrying a small, specific tag to
+reach the few people who follow it. The opposite holds: questions whose most
+specific tag has under a thousand questions a year are accepted 9% less often
+than average, and questions carrying only mega-tags 26% more. Popular tags have
+answerers watching; niche ones do not.
 
-Deliberately excluded: `users.reputation`. It is a snapshot taken when the dump
-was built in late 2022, not the asker's reputation on the day they posted. Using
-it to explain a January 2022 outcome pours ten months of future information into a
-predictor. I used account age and prior-question history instead, both computed
-strictly from what preceded the question, with a 90-day lag so that a prior
-question's own outcome had time to settle.
+Also worth stating: **question comment count has essentially no relationship with
+either outcome** (every bucket between 0.92 and 1.06). I had expected comments to
+signal an unclear question. They do not, and I am reporting that rather than
+dropping it. Posting time matters a little — late evening UTC and weekends do
+5–7% better on acceptance — and is the cheapest thing on the list to act on.
+
+Deliberately excluded: `users.reputation`. It is a snapshot taken when the dump was
+built in late 2022, not the asker's reputation on the day they posted. Using it to
+explain a January 2022 outcome pours ten months of future information into a
+predictor. I used account age, prior questions, prior answers written and prior
+acceptance instead, all computed strictly from what preceded the question — and
+"preceded" is enforced on the *event*, not the question: a prior question counts
+as accepted only if the acceptance vote is dated before the new question was
+asked. The first version of this table read acceptance from the question's final
+state, which let the classic "come back, accept the old answers, ask the new one"
+session leak in; correcting it moved "never accepted before" from 0.62× to 0.52×.
 
 ---
 
 ## Data quality and validation
 
-`sql/00_profiling/04_data_quality_checks.sql` returns 15 assertions with an
-expectation attached to each (`results/04_data_quality_checks.csv`). Thirteen
-pass. The two that do not are the interesting ones.
+`sql/04_validation/40_data_quality_checks.sql` returns 25 assertions with an
+expectation attached to each (`results/40_data_quality_checks.csv`). Of the 17
+blocking checks, 14 pass and 3 fail; the 8 informational ones are the interesting
+part.
 
 | check | result | what I did |
 |---|---|---|
-| days since the newest question | **1,436 — FAIL** | redefined the analysis window from the data; this is what a freshness assertion is for, and in a live pipeline it would have paged someone in December 2022 |
-| accepted answer predates its own question | **1 row — FAIL** | question 72063568, accepted answer 18 days older. A merged or migrated post. One row in 2.75M; left in, noted here |
-| accepted answer id resolves to a real answer | 0 orphans | — |
-| accepted answer belongs to the right question | 0 | — |
-| `answer_count` vs answers actually present | 2 rows disagree | the denormalised counter is trustworthy, which is unusual and worth knowing |
-| duplicate ids, null tags, >5 tags, empty bodies | 0 | — |
-| asker's account deleted after posting | 36,575 | reclassified as post-hoc, see below |
+| days since the newest question | **FAIL** — see run date in `run_log.md` | redefined the analysis window from the data; this is what a freshness assertion is for, and in a live pipeline it would have paged someone in December 2022 |
+| accepted answer predates its own question | **1 row — FAIL** | a merged or migrated post; one row in 1.1M, left in |
+| asker account created after the question | **12 rows — FAIL** | account merges; the age feature treats them as negative and they fall out of its buckets |
+| every accepted question has an acceptance vote | 0 missing | this is what lets acceptance be dated, and it is asserted as a row rather than assumed |
+| newest answer and newest acceptance vote vs the question snapshot | 0 days | all tables were cut on the same day, so nothing in the window is censored by a table ending early |
+| acceptance votes with a time other than midnight | 0 | the column is date-only; all timing here is in whole calendar days |
+| accepted answer resolves, belongs to the right question; duplicate ids, null tags, >5 tags, empty bodies | 0 | — |
+| `answer_count` vs answers actually present | 0 disagree | the counter and the dump both exclude deleted answers |
+| asker's account deleted after posting | 9,883, all with a display name | reclassified as post hoc, see below |
+| tags not in the site's tag table | 0 | — |
+| **the deletion boundary** — answer-rate step a year before the snapshot | **13 points** | see below |
+| **the deletion boundary** — negative-score questions still unanswered | **936** of 81,317 | see below |
 
-Two things surfaced during the work rather than from the checklist.
+**The site deletes the questions that would have failed.** Stack Overflow
+automatically removes questions that are a year old, unanswered and at zero or
+negative score (and closed unanswered questions much sooner), and the public dump
+excludes deleted posts. The fingerprint is in `results/02_question_volume_by_period.csv`:
+the monthly answer rate is 79.6% in August 2021, 75.7% in September, and 66.8% in
+October — a 13-point step at exactly 365 days before the snapshot of 25 September
+2022, flat on both sides — and the share of questions that are still unanswered
+with a non-positive score, the population the rule removes, is 12.5% in August
+2021 and 26.6% in October 2021. Three consequences, each of which an earlier draft
+of this analysis got wrong:
 
-**`votes.creation_date` is date-only.** Every acceptance vote in the table sits at
-exactly midnight. Compared against a question's full timestamp, 44% of same-day
-acceptances appear to have happened *before* the question was asked. All timing
-here is therefore computed in whole calendar days, which is the real resolution of
-the data.
+- **The previous year is not a control.** Its January–September months are a
+  survivor population, purged of exactly the questions that make a tag look bad,
+  and unevenly across tags. The sensitivity table keeps that variant, labelled,
+  to show what it does (bottom-ten retention 3 of 6, the worst of any variant);
+  the honest out-of-window comparison is October–December 2021, the previous
+  year's un-purged months.
+- **"Answer rates were falling" is mostly this artefact**, not behaviour: the
+  fall from ~80% to ~60% is the boundary, and the surviving rows cannot say how
+  much real decline sits underneath.
+- **Questions with a negative score are answered 98.5% of the time** — the
+  highest of any bucket in the analysis — not because downvotes attract answers
+  but because negative-score questions *without* answers were deleted. Their
+  conversion from answered to accepted (40%) is the lowest of any score bucket,
+  which is what survivorship predicts and "attention produces both" does not.
+  Within the 2022 cohort the deletion rules act uniformly (every question was old
+  enough for the closure rule and too young for the year rule), so the ranking is
+  consistent, but every rate in this README is an upper bound on the live site's.
+
+**`votes.creation_date` is date-only.** Every acceptance vote sits at exactly
+midnight. Compared against a question's full timestamp, every same-day
+acceptance — 43% of them — would appear to have happened *before* the question
+was asked. All timing here is therefore computed in whole calendar days, which is
+the real resolution of the data.
 
 **A null `owner_user_id` is not an anonymous asker.** It looks like one, and as a
-post-time attribute it showed a 44% acceptance rate against a 30% baseline —
+post-time attribute it showed a 43% acceptance rate against a 30% baseline —
 implausible enough to check. Stack Overflow keeps `owner_display_name` and drops
-the id when an **account is deleted**, and all 10,193 such rows in the 2022 cohort
-have a display name. It records an event in the future relative to the post, so it
-belongs with `score` and `view_count`, not with title length.
+the id when an **account is deleted**, and all 9,883 such rows in the cohort have a
+display name (the check above). It records an event in the future relative to the
+post, so it belongs with `score` and `view_count`, not with title length — and it
+is excluded from every asker-history bucket rather than counted as "no history".
 
 ---
 
 ## Assumptions, limitations, confidence
 
-**Assumptions.** "Approved" means accepted by the asker. "Current year" means 2022
-through 26 August. Outcomes are measured within 30 days of asking — chosen because
-89% of all eventual acceptances happen inside that window, and 93% within 90
-(`results/03_acceptance_timing.csv`). A tag qualifies for ranking at 886 questions,
-the smallest sample that pins its rate to ±3 points at 95% confidence given the
-cohort's own base rate; that keeps 473 of 41,411 tags, covering 66% of all tag
-assignments. Timestamps are UTC.
+**Assumptions.** "Approved" means accepted by the asker; the other readings are
+quantified in F3. "Current year" means 2022 through 26 August. Outcomes are
+measured within 30 days of asking — chosen because 89% of all eventual
+acceptances happen inside that window and 93% within 90, measured on the
+fully-matured 2019 cohort (`results/41_acceptance_timing.csv`). A tag qualifies for
+ranking at 892 questions, the smallest sample that pins its rate to ±3 points at
+95% confidence given the cohort's own base rate; that keeps 470 of 41,411 tags,
+covering 66% of all tag assignments (`results/25_summary_figures.csv`). Timestamps
+are UTC.
 
 **Limitations, in the order I would want a reviewer to weigh them.**
 
-*Deleted posts are absent.* Stack Overflow's dumps exclude them, and unanswered
-low-quality questions are deleted disproportionately. **Every rate here is an
-upper bound**, and the inflation is probably larger in beginner-heavy tags —
-meaning the true gap between the top and bottom lists is likely wider than
-measured. No amount of SQL on this dataset can correct it.
+*Deleted posts are absent, and not at random.* The site removes unanswered
+low-quality questions, so **every rate here is an upper bound**, the inflation is
+larger in beginner-heavy tags, and the true gap between the top and bottom lists
+is likely wider than measured. Within the cohort the rules act uniformly; across
+the year boundary they do not, which is why the previous year is not used as a
+control.
 
 *Tags are not independent.* A question carries up to five and is counted under
 each, so these are marginal rates. `dplyr` and `tidyverse` are largely the same
 questions. The ranking should be read as roughly a dozen clusters, not 20
 independent findings.
 
-*Acceptance is one person's decision.* It measures asker follow-through as well as
-answer quality. F2 quantifies how much: about 42% of the spread.
+*The definition is the largest source of uncertainty.* Per question or per
+answer, accepted or upvoted: F3 shows the first of these inverts the ranking and
+the second reshuffles half the top ten. At n in the hundreds of thousands the
+statistical intervals on the two lists are ±1.5–3 points per tag; the definitional
+uncertainty is an order of magnitude larger, and reporting tighter intervals
+would be false precision about a question that was never fully specified.
 
-*Statistical precision is not the binding constraint.* At n in the millions the
-intervals are ±1 point or less. Changing the volume floor moves the bottom list by
-nine names out of ten. The uncertainty here is definitional, not statistical, and
-reporting a tighter interval would be false precision about a question that was
-never fully specified.
+*Acceptance is one person's decision.* It measures asker follow-through as well
+as answer quality; 32% of questions with an upvoted answer were never accepted.
+
+*The text features are regular expressions.* The error detector is 84% precise on
+a fixed sample; "expected result" and "what I tried" match phrasings, not
+intentions; body length ignores HTML entities. Each is good enough to rank
+buckets and not good enough to score an individual post.
 
 **What would change my mind.**
 
-- If the within-asker gap had collapsed instead of holding at 28 points, I would
+- If the within-asker gap had collapsed instead of holding at 29 points, I would
   have abandoned the tag framing and treated this as user segmentation.
-- If a dataset including closed and deleted questions cut the top tags' advantage
-  by more than half, I would conclude I had been measuring moderation policy.
-- If the bottom-ten list did not reproduce on a non-overlapping time window, I
-  would treat it as noise. It half-reproduces on 2021 (4 of 10), which is why I
-  have labelled its confidence moderate rather than high.
+- If the bottom tags had turned out to be 30% closed-as-duplicate, I would have
+  called the bottom list a moderation artefact. They are 0.5–4% closed; only
+  `google-chrome-extension` is policed, and it stays at the bottom without it.
+- If a dataset including deleted questions cut the top tags' advantage by more
+  than half, I would conclude I had been measuring deletion policy.
+- If the un-purged months of 2021 had ranked the common tags differently
+  (correlation 0.97, every eligible name retained), I would have treated the
+  lists as noise.
 
 ---
 
 ## Prompt 3 — with more time
 
-Two analyses, chosen because each resolves something I currently cannot answer.
+Three analyses, chosen because each resolves something I currently cannot answer.
 
-**1. Separate "nobody answered" from "closed as a duplicate".** My bottom tags
-fail mostly at the answering stage, and I cannot distinguish a genuinely hard
-question from one that was closed as a duplicate within an hour — the second is a
-moderation outcome, not a difficulty signal, and popular beginner-heavy tags
-attract far more of them. `post_links` (link type 3) and `post_history` (type 10)
-carry both, and `post_history` is the largest table in the dataset at 113 GB, so
-this needs a deliberate one-pass extract rather than casual joins. It would tell
-me whether tags like `google-chrome` are hard to answer or merely well-policed —
-which changes the recommendation completely.
-
-**2. Move the unit of analysis from the question to the answer.** Everything here
+**1. Move the unit of analysis from the question to the answer.** Everything here
 asks which questions get resolved. The complementary question is which *answers*
 win: does answerer tenure, response latency, length or code content predict
 acceptance, holding the question constant? Comparing answers to the *same*
 question controls for question quality perfectly, which no design in this
 submission does. That is what you would need to intervene — advice to answerers
-rather than to askers — and it would also test the error-message finding above
-directly, by checking whether error-bearing questions attract answers that are
-plausible but unverifiable.
+rather than to askers — and it would test the error-message finding directly, by
+checking whether error-bearing questions attract answers that are plausible but
+unverifiable. The narrow answer columns are already materialized; the cost is one
+more pass over the answer bodies (about 20 GB).
 
-Also worth naming: the Stack Exchange data dump is still published and current
-through 2026. Answering the prompt's literal question about the *actual* current
-year means loading that instead, and the interesting part would be the comparison
-— question volume and answer rates were already falling sharply before this
-snapshot ends, and the arrival of LLM assistants sits entirely outside it.
+**2. Measure the deletion, instead of bounding it.** The public dump cannot show
+what was deleted, but the live site's API can: for a sample of tags, count the
+question ids that exist in the dump against the id range for the period, and the
+gap is the purge. Done per tag, it turns "every rate is an upper bound" into a
+corrected rate, and it would tell me whether the top tags' advantage is as large
+on the live site as it is here — the one limitation no amount of SQL on this
+dataset can address.
+
+**3. A nudge experiment on the acceptance stage.** Prompt askers who have an
+upvoted, unaccepted answer for a week. If acceptance rises evenly across tags, the
+second funnel stage is follow-through (H2's mechanism, even if not its population);
+if it rises only where answers were verifiable, it is answer quality (H1). This is
+the only design that separates the two, and it is a product change, not a query.
+
+Also worth naming: the prompt's literal question about the *actual* current year
+needs a newer dataset than this one. Stack Exchange still publishes a data dump,
+under changed access terms since 2024; loading it would make the comparison — and
+the arrival of LLM assistants, which sits entirely outside this snapshot — the
+interesting part.
 
 ---
 
 ## Repository
 
 ```
-sql/00_profiling/       freshness, volume over time, acceptance timing, data quality
-sql/01_cohort/          the analysis base (one pass over the body column) and outcomes
-sql/02_tag_approval/    prompt 1: funnel, rankings, within-asker test, sensitivity
-sql/03_post_qualities/  prompt 2: leakage-safe asker history, attribute rates
-results/                committed outputs, plus run_log.md with cost per query
+sql/00_profiling/       freshness and physical layout; volume, outcomes and the deletion boundary by month
+sql/01_cohort/          params derived from the data; the one pass over body; answers, vote dates,
+                        moderation events; outcomes in a fixed window; cohort summary
+sql/02_tag_approval/    prompt 1: derived floor, funnel, rankings, within-asker test, sensitivity,
+                        summary figures, the full eligible list
+sql/03_post_qualities/  prompt 2: leakage-free asker history, attribute rates, within-tag lifts,
+                        the tag-position test
+sql/04_validation/      data-quality assertions, acceptance timing, the error-detector sample
+results/                committed outputs, plus run_log.md with the cost of each query
 docs/sql-style.md       the SQL and cost conventions I held myself to
-scripts/run_queries.sh  runs everything end to end and regenerates results/
+scripts/run_queries.sh  runs everything end to end, in dependency order, and regenerates results/
 ```
 
 To reproduce, in your own project:
@@ -346,11 +538,18 @@ bq --location=US mk --dataset "$BQ_PROJECT:so_analysis"
 BQ_PROJECT=your-project-id ./scripts/run_queries.sh
 ```
 
-**Cost.** The whole analysis bills **52.4 GB**, 5% of the BigQuery sandbox's
-monthly allowance, and 36.7 GB of that is a single query. `posts_questions` is not
-partitioned or clustered — I checked — so a `WHERE creation_date >= ...` filter
-reduces nothing. In fact adding one to a bare `COUNT(*)` takes it from 0 bytes to
-184 MB, because the count is answered from metadata until the filter forces a
-column read. The only lever on this dataset is which columns you touch, so the
-strategy is to read `body` exactly once, derive every text feature in that pass,
-and have all eleven other queries read the narrow result instead.
+The runner checks that the dataset exists, runs the files in path order (which is
+dependency order), writes each output atomically, and reads each query's cost back
+from its own job. Running it twice on the same day produces byte-identical CSVs:
+every ordering ends with a tie-breaker, and only the freshness check counts days.
+
+**Cost.** The whole analysis bills **55.9 GB**, 5.5% of the BigQuery sandbox's
+monthly allowance, and 36.6 GB of that is the single query that reads
+`posts_questions.body`. These public tables are not partitioned or clustered
+(`results/01_dataset_freshness.csv` checks the catalogue), so a `WHERE` on a date
+reduces nothing; the only lever is which columns you touch. The strategy is to
+read each source table once, narrow, and materialize — `body` exactly once, with
+every text feature derived in that pass — so that 13 of the 23 queries read
+nothing but those tables, measured in megabytes. Closure and duplicate events,
+which look expensive because `post_history` is 113 GB, cost 3.6 GB once that table
+is read without its text column.
