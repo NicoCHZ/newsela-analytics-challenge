@@ -24,7 +24,10 @@ still do the right thing if the source is ever reloaded.
 ### F1. The tags with the highest and lowest rate of accepted answers
 
 Ranked by a 95% confidence bound among the 470 tags with enough questions to pin
-their rate to within 3 points, in the order the query ranks them.
+their rate to within 3 points, in the order the query ranks them. Highest is
+ordered by the lower bound (the rate I am confident a tag is at least at);
+lowest by the upper bound. That is why `pandas-groupby` (60.2%) sits below
+`regex` (59.8%): regex has a tighter interval.
 
 | Highest | n | accepted | 95% CI | | Lowest | n | accepted | 95% CI |
 |---|---:|---:|---|---|---|---:|---:|---|
@@ -50,12 +53,9 @@ depends on a machine nobody else can see. Two further columns say the same thing
 more sharply. A top-list question draws 1.2 to 2.5 answers; a bottom-list question
 draws 0.3 to 0.5. And when a bottom-list question does get an accepted answer, the
 asker wrote it themselves 17% to 48% of the time (`webpack` 48%, `ssl` 42%, `proxy`
-34%), against 1.5% to 2.8% at the top. In these tags, being solved usually means
-solving it yourself.
+34%), against 1.5% to 2.8% at the top.
 
-### F2. The headline metric is a compound of two different things
-
-Splitting it apart is the most useful thing in this analysis:
+### F2. Acceptance is two rates multiplied together
 
 | | asked → answered | answered → accepted | overall |
 |---|---:|---:|---:|
@@ -69,9 +69,8 @@ are correlated at 0.63, so they are not independent
 (`results/25_summary_figures.csv`; the decomposition is exact in logarithms and
 splits the covariance evenly). The second stage is more than "did the asker come
 back": it mixes whether the answers were any good with whether anyone returned to
-say so. The nearest thing to a pure follow-through figure is this: of the questions
-that had a community-upvoted answer within 30 days, 32% were never accepted by
-anyone.
+say so. Of the questions that had a community-upvoted answer within 30 days, 32%
+were never accepted by anyone.
 
 ### F3. How much of the ranking is the method
 
@@ -99,17 +98,21 @@ every change of window, floor, bound, year or moderation. What moves is which te
 names sit at the extremes when the floor admits smaller tags. With the looser
 floor, nine of the bottom ten are displaced, by `facebook-graph-api`, `magento2`,
 `cpanel`, `appium`, `elementor` and their like: the same kind of tag, with even
-worse rates. The bottom is a tier rather than a list. Fifteen eligible tags have
-an upper bound below 17%, every one of them a platform, integration or tooling
-tag, and the ten names above are the lowest ten of them. I would report the top
-list as a list and the bottom as a category.
+worse rates. Fifteen eligible tags have an upper bound below 17%, every one of
+them a platform, integration or tooling tag, and the ten names above are the
+lowest ten of that group. I would report the top as a list and the bottom as a
+category.
+
+`results/22_tag_rankings.csv` also ranks with no floor and no interval
+(`naive_highest` / `naive_lowest`). The top of that list is `jstreer`: 10
+questions, 100%. That is what the prompt's question looks like before any of the
+choices above.
 
 Only the definition changes the result. If "rate of approved answers" is read per
 answer written (accepted answers over answers), `awk` and `sed` fall to the
 bottom: they attract two or three answers per question, and only one can be
 accepted. That reading measures competition among answerers rather than whether
-askers get helped. I explain below why I chose the per-question reading, but the
-choice does more work than any threshold.
+askers get helped. I explain below why I chose the per-question reading.
 
 ### F4. For prompt 2, the strongest attribute is not about the question at all
 
@@ -123,14 +126,14 @@ the topic held constant (89% and 67% of the gap, respectively).
 
 ### Implications, as hypotheses
 
-If I were advising the site, I would test three things. The submission form could
-ask for the expected result and a code block, since both go with better outcomes
+If I were advising the site, I would test these. The submission form could ask
+for the expected result and a code block, since both go with better outcomes
 inside every topic. A reminder to askers sitting on an upvoted, unaccepted answer
-would target the 32% of resolved questions that never close the loop. And since
-questions in the bottom tier are mostly solved by their own askers, they may need
-a different support path (diagnostics, environment capture) rather than more
-answerers. Each of these would need an experiment; none is a finding of this
-analysis.
+would target the 32% of questions that had an upvoted answer and were never
+accepted. And since accepted answers in the bottom tier are often the asker's own
+(`webpack` 48%, `ssl` 42%), those questions may need a different support path
+(diagnostics, environment capture) rather than more answerers. Each of these
+would need an experiment; none is a finding of this analysis.
 
 ---
 
@@ -144,7 +147,7 @@ under the other reading.
 | "approved answers" | the asker accepted an answer (the green check) | an answer the community upvoted | 5 of the top 10 change (`haskell`, `julia`, `c++20` enter); rank correlation 0.94 |
 | "rate of approved answers" | per question: share of questions with an accepted answer | per answer: accepted answers over answers written | the ranking inverts (correlation 0.53); see F3 |
 | "the current year" | 2022 to 26 August, the last year in the data | the trailing twelve months, or the previous full year | the previous year is a survivor population (see Data quality); the trailing twelve months would straddle the boundary |
-| "lead to" | association; nothing here identifies a cause | none | see "On lead to" below |
+| "lead to" | association; nothing here identifies a cause | none | see "The metric" below |
 | "qualities on a post" | attributes of the post, plus attributes of the poster knowable at post time | the post alone | the asker's record is the strongest attribute, and it is labelled as the poster's rather than the post's |
 
 ---
@@ -161,11 +164,9 @@ accepted questions that had a real choice to make, meaning more than one answer,
 15.0% accepted something other than the highest-scored answer, and 12.4% of
 accepted answers were written by the asker themselves.
 
-**On "lead to".** The prompt asks which tags lead to higher approval. Nothing here
-can support that. Tags are chosen by the asker and describe what the question
-already is; you cannot add `regex` to a Kubernetes question and see what happens.
-The counterfactual is incoherent, not merely unidentified. Everything above is
-association.
+The prompt asks which tags lead to higher approval. Tags are chosen by the asker
+and describe what the question already is. You cannot add `regex` to a Kubernetes
+question and see what happens. The numbers above are associations.
 
 ### 1a. Competing explanations
 
@@ -209,19 +210,23 @@ bottom names and leaves the tier intact (F3).
 Browser and platform questions depend on a version, an extension set and an OS
 the answerer cannot see, so the same answer is right in one environment and wrong
 in another. The person who can finally see the problem is the asker, which is why
-they end up answering it. That is H1, and the self-answer share is its clearest
-fingerprint.
+they end up answering it. That is H1. The self-answer share is the clearest mark
+of it in this data.
 
 ### 1c. Testing H2 and H3, and what happened
 
-**H2: hold the person constant.** If tag approval is largely a measure of user
-retention wearing a topic as a costume, the gap should collapse when the same
-person asks in both kinds of tag. The test
-(`sql/02_tag_approval/23_within_asker_test.sql`) picks the 50 highest and 50 lowest
-tags on half the questions and measures on the other half, so choosing the
-extremes does not reward its own noise. It weights each person's own difference by
-how many questions they have on each side, which makes it comparable with the
-population gap:
+I pick H1 (the problem is tractable). The tests below are what I ran to try to
+kill it, by checking the two alternatives that would look the same in the funnel.
+
+#### Holding the person constant
+
+If tag approval is largely a measure of user retention wearing a topic as a
+costume, the gap should collapse when the same person asks in both kinds of tag.
+The test (`sql/02_tag_approval/23_within_asker_test.sql`) picks the 50 highest and
+50 lowest tags on half the questions and measures on the other half, so choosing
+the extremes does not reward its own noise. It weights each person's own
+difference by how many questions they have on each side, which makes it
+comparable with the population gap:
 
 | comparison | gap |
 |---|---:|
@@ -241,17 +246,21 @@ about the one-time askers H2 is really about. It also cannot separate "the probl
 was not solvable" from "the answer arrived too late for this person to care";
 the two would look identical here.
 
-**H3: does the tag do better when it leads?** No (`results/33_tag_position.csv`).
-The bottom tags are more often the first tag on their questions than the top tags
-are (19% against 10%), and they do worse when they lead: 11.4% accepted as the
-first tag against 14.3% when trailing. What is true is that they keep very mixed
-company, 51 distinct co-tags per hundred questions against 17 at the top, which
-fits H1's picture of integration problems spanning several technologies better
-than the bystander story. H3 is rejected as stated.
+#### Does the tag do better when it leads?
 
-**What I would still need.** Whether the asker returned to the site at all after
-posting (the users table has no last-seen date); deleted questions, which this
-dataset omits entirely; and ideally a nudge experiment: prompt askers sitting on
+No (`results/33_tag_position.csv`). The bottom tags are more often the first tag
+on their questions than the top tags are (19% against 10%), and they do worse
+when they lead: 11.4% accepted as the first tag against 14.3% when trailing. What
+is true is that they keep very mixed company, 51 distinct co-tags per hundred
+questions against 17 at the top, which fits H1's picture of integration problems
+spanning several technologies better than the bystander story. H3 is rejected as
+stated.
+
+#### What I would still need
+
+The users table has no last-seen date, so I cannot tell whether the asker
+returned to the site at all after posting. Deleted questions are omitted entirely.
+The remaining test I would want is a nudge experiment: prompt askers sitting on
 an upvoted unaccepted answer, and see whether acceptance rises evenly across tags
 (H2) or only where the answer was verifiable (H1).
 
@@ -263,7 +272,8 @@ The classification matters more than the ranking. Every attribute falls into one
 of two groups, and only one of them can support advice. Attributes known at post
 time are true the moment you hit submit, so a person can act on them. Post hoc
 attributes accumulate afterwards: `score`, `view_count`, `comment_count`, whether
-the account was later deleted. These correlate beautifully and explain nothing.
+the account was later deleted. These correlate with the outcome and explain
+nothing.
 
 The table shows selected results; the full table is in
 `results/31_post_quality_rates.csv`. Lift is relative to the cohort baseline,
@@ -356,8 +366,7 @@ prior acceptance instead, all computed strictly from what preceded the question.
 "Preceded" is enforced on the event, not the question: a prior question counts as
 accepted only if the acceptance vote is dated before the new question was asked.
 Reading acceptance from the question's final state instead would let the classic
-"come back, accept the old answers, ask the new one" session leak in, and would
-put the "never accepted before" bucket at 0.62 rather than 0.52.
+"come back, accept the old answers, ask the new one" session leak in.
 
 ---
 
@@ -383,10 +392,11 @@ part.
 | the deletion boundary: answer-rate step a year before the snapshot | 13 points | see below |
 | the deletion boundary: negative-score questions still unanswered | 936 of 81,317 | see below |
 
-**The site deletes the questions that would have failed.** Stack Overflow
-automatically removes questions that are a year old, unanswered and at zero or
-negative score (and closed unanswered questions much sooner), and the public dump
-excludes deleted posts. The fingerprint is in
+### The site deletes the questions that would have failed
+
+Stack Overflow automatically removes questions that are a year old, unanswered
+and at zero or negative score (and closed unanswered questions much sooner), and
+the public dump excludes deleted posts. The pattern is in
 `results/02_question_volume_by_period.csv`. The monthly answer rate is 79.6% in
 August 2021, 75.7% in September and 66.8% in October: a 13-point step at exactly
 365 days before the snapshot of 25 September 2022, flat on both sides. The share
@@ -413,36 +423,42 @@ survivorship predicts. Within the 2022 cohort the deletion rules act uniformly
 rule), so the ranking is consistent, but every rate in this README is an upper
 bound on the live site's.
 
-**`votes.creation_date` is date-only.** Every acceptance vote sits at exactly
-midnight. Compared against a question's full timestamp, every same-day acceptance
-(43% of them) would appear to have happened before the question was asked. All
-timing here is therefore computed in whole calendar days, which is the real
-resolution of the data.
+### `votes.creation_date` is date-only
 
-**A null `owner_user_id` is not an anonymous asker.** It looks like one, and as a
-post-time attribute it showed a 43% acceptance rate against a 30% baseline, which
-was implausible enough to check. Stack Overflow keeps `owner_display_name` and
-drops the id when an account is deleted, and all 9,883 such rows in the cohort
-have a display name (the check above). It records an event in the future relative
-to the post, so it belongs with `score` and `view_count` rather than with title
-length, and it is excluded from every asker-history bucket rather than counted as
-"no history".
+Every acceptance vote sits at exactly midnight. Compared against a question's
+full timestamp, every same-day acceptance (43% of them) would appear to have
+happened before the question was asked. All timing here is therefore computed in
+whole calendar days, which is the real resolution of the data.
+
+### A null `owner_user_id` is not an anonymous asker
+
+It looks like one, and as a post-time attribute it showed a 43% acceptance rate
+against a 30% baseline, which was implausible enough to check. Stack Overflow
+keeps `owner_display_name` and drops the id when an account is deleted, and all
+9,883 such rows in the cohort have a display name (the check above). It records
+an event in the future relative to the post, so it belongs with `score` and
+`view_count` rather than with title length, and it is excluded from every
+asker-history bucket rather than counted as "no history".
 
 ---
 
 ## Assumptions, limitations, confidence
 
-**Assumptions.** "Approved" means accepted by the asker; the other readings are
-quantified in F3. "Current year" means 2022 through 26 August. Outcomes are
-measured within 30 days of asking, because 89% of all eventual acceptances happen
-inside that window and 93% within 90, measured on the fully matured 2019 cohort
+### Assumptions
+
+"Approved" means accepted by the asker; the other readings are quantified in F3.
+"Current year" means 2022 through 26 August. Outcomes are measured within 30 days
+of asking, because 89% of all eventual acceptances happen inside that window and
+93% within 90, measured on the fully matured 2019 cohort
 (`results/41_acceptance_timing.csv`). A tag qualifies for ranking at 892
 questions, the smallest sample that pins its rate to within 3 points at 95%
 confidence given the cohort's own base rate. That keeps 470 of 41,411 tags,
 covering 66% of all tag assignments (`results/25_summary_figures.csv`).
 Timestamps are UTC.
 
-**Limitations, in the order I would want a reviewer to weigh them.**
+### Limitations
+
+These are in the order I would want a reviewer to weigh them.
 
 Deleted posts are absent, and not at random. The site removes unanswered
 low-quality questions, so every rate here is an upper bound, the inflation is
@@ -471,7 +487,7 @@ a fixed sample; "expected result" and "what I tried" match phrasings, not
 intentions; body length ignores HTML entities. Each is good enough to rank
 buckets and not good enough to score an individual post.
 
-**What would change my mind.**
+### What would change my mind
 
 - If the within-asker gap had collapsed instead of holding at 29 points, I would
   have abandoned the tag framing and treated this as user segmentation.
@@ -488,33 +504,34 @@ buckets and not good enough to score an individual post.
 
 ## Prompt 3: with more time
 
-Three analyses, chosen because each resolves something I cannot answer now.
+### Move the unit of analysis from the question to the answer
 
-**1. Move the unit of analysis from the question to the answer.** Everything here
-asks which questions get resolved. The complementary question is which answers
-win: does answerer tenure, response latency, length or code content predict
-acceptance, holding the question constant? Comparing answers to the same question
-controls for question quality perfectly, which no design in this submission does.
-That is what you would need in order to intervene, with advice to answerers rather
-than to askers, and it would test the error-message finding directly by checking
-whether error-bearing questions attract answers that are plausible but
-unverifiable. The narrow answer columns are already materialized; the cost is one
-more pass over the answer bodies (about 20 GB).
+Everything here asks which questions get resolved. The complementary question is
+which answers win: does answerer tenure, response latency, length or code content
+predict acceptance, holding the question constant? Comparing answers to the same
+question controls for question quality perfectly, which no design in this
+submission does. That is what you would need to intervene, with advice to
+answerers rather than to askers, and it would test the error-message finding
+directly by checking whether error-bearing questions attract answers that are
+plausible but unverifiable. The narrow answer columns are already materialized;
+the cost is one more pass over the answer bodies (about 20 GB).
 
-**2. Measure the deletion instead of bounding it.** The public dump cannot show
-what was deleted, but the live site's API can. For a sample of tags, count the
-question ids that exist in the dump against the id range for the period; the gap
-is the purge. Done per tag, it turns "every rate is an upper bound" into a
-corrected rate, and it would tell me whether the top tags' advantage is as large on
-the live site as it is here. That is the one limitation no amount of SQL on this
-dataset can address.
+### Measure the deletion instead of bounding it
 
-**3. A nudge experiment on the acceptance stage.** Prompt askers who have had an
-upvoted, unaccepted answer for a week. If acceptance rises evenly across tags, the
-second funnel stage is follow-through (H2's mechanism, even if not its
-population). If it rises only where answers were verifiable, it is answer quality
-(H1). This is the only design that separates the two, and it is a product change
-rather than a query.
+The public dump cannot show what was deleted, but the live site's API can. For a
+sample of tags, count the question ids that exist in the dump against the id
+range for the period; the gap is the purge. Done per tag, it turns "every rate is
+an upper bound" into a corrected rate, and it would tell me whether the top tags'
+advantage is as large on the live site as it is here. That is the one limitation
+no amount of SQL on this dataset can address.
+
+### A nudge experiment on the acceptance stage
+
+Prompt askers who have had an upvoted, unaccepted answer for a week. If
+acceptance rises evenly across tags, the second funnel stage is follow-through
+(H2's mechanism, even if not its population). If it rises only where answers were
+verifiable, it is answer quality (H1). This is the only design that separates the
+two, and it is a product change rather than a query.
 
 The prompt's literal question about the actual current year needs a newer dataset
 than this one. Stack Exchange still publishes a data dump, under access terms that
@@ -540,7 +557,7 @@ docs/sql-style.md       the SQL and cost conventions I held myself to
 scripts/run_queries.sh  runs everything end to end, in dependency order, and regenerates results/
 ```
 
-To reproduce, in your own project:
+To reproduce, in your own project (requires the `bq` CLI and `jq`):
 
 ```bash
 bq --location=US mk --dataset "$BQ_PROJECT:so_analysis"
@@ -552,8 +569,10 @@ dependency order), writes each output atomically, and reads each query's cost ba
 from its own job. Running it twice on the same day produces byte-identical CSVs:
 every ordering ends with a tie-breaker, and only the freshness check counts days.
 
-**Cost.** The whole analysis bills 55.9 GB, 5.5% of the BigQuery sandbox's
-monthly allowance, and 36.6 GB of that is the single query that reads
+### Cost
+
+The whole analysis bills 55.9 GB, 5.5% of the BigQuery sandbox's monthly
+allowance, and 36.6 GB of that is the single query that reads
 `posts_questions.body`. These public tables are not partitioned or clustered
 (`results/01_dataset_freshness.csv` checks the catalogue), so a `WHERE` on a date
 reduces nothing; the only lever is which columns you touch. The strategy is to
