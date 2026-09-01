@@ -1,0 +1,26 @@
+check_name,observed,severity,expectation,status
+accepted answer belongs to a different question,0,blocking,expected 0,PASS
+accepted answer created before its own question,1,blocking,expected 0,FAIL
+accepted answer id not present in posts_answers,0,blocking,expected 0,PASS
+accepted question with no acceptance vote in the votes table,0,blocking,expected 0,PASS
+asker account created after the question,12,blocking,expected 0,FAIL
+cohort question with no outcome row,0,blocking,expected 0,PASS
+deleted-account asker without a display name,0,blocking,expected 0 - the site keeps the name when it drops the id,PASS
+duplicate question ids,0,blocking,expected 0,PASS
+empty or null title or body,0,blocking,expected 0,PASS
+freshness: days since the newest question in the source,1437,blocking,expected under 7 in a live pipeline,FAIL
+marked accepted but answer_count is zero,0,blocking,expected 0,PASS
+negative answer_count,0,blocking,expected 0,PASS
+newest acceptance vote: days before the question snapshot,0,blocking,expected 0 or 1 - all tables cut on the same day,PASS
+newest answer: days before the question snapshot,0,blocking,expected 0 or 1 - all tables cut on the same day,PASS
+question outside every cohort region,0,blocking,expected 0,PASS
+questions with more than five tags,0,blocking,expected 0 - that is the site limit,PASS
+questions with no tags,0,blocking,expected 0,PASS
+acceptance votes with a time of day other than midnight,0,informational,"expected 0: the column is date-only, so timing is computed in whole days",NOTED
+answer_count disagrees with the answers actually present,0,informational,"expected near 0: the counter excludes deleted answers, as does the dump",NOTED
+asker account deleted after posting,9883,informational,"expected non-zero; a post-hoc attribute, not an anonymous asker",NOTED
+asker id not found in the users table,3,informational,expected near 0,NOTED
+community wiki posts in the cohort,2,informational,no single owner - acceptance means something different,NOTED
+deletion boundary: answer-rate step one year before the snapshot (points),13,informational,expected well above 5: older months are a survivor population,NOTED
+deletion boundary: negative-score questions still unanswered,936,informational,"expected near 0: the site deletes them, so the survivors are the answered ones",NOTED
+distinct tags not present in the tags table,0,informational,expected 0,NOTED

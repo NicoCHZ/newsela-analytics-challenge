@@ -1,0 +1,51 @@
+question_id,matched_context
+70554000, to use something like this &gt; ':flag_jp:' Is &gt; DiscordAPIError: Unknown Emoji EDIT as requested i have pasted 
+70570000,); } catch (InterruptedException e) { e.printStackTrace(); } } } Test c
+70618000,sets:precompile remote: rake aborted! remote: NoMethodError: undefined method `[]' for nil:NilClass remote: /tmp/b
+70652000,"n super(MatplotlibWidget, self).eventFilter(source, event) TypeError: super(type, obj): obj must be an instance or subtype of type"
+70708000,um launcher started postgres_1 | ERROR: canceling autovacuum task postgres_1 
+70740000,ly the first one works and the others throw java.lang.IllegalStateException: Failed to load ApplicationContext . I have been debugg
+70758000,: 2022-01-18 07:15:14.27 fst_ArchFailedFile:Error: An error occurred with the following error message: &quot;Th
+70760000,"5,118 [ERROR] (rapid) Init failed error=Runtime exited with error: exit status 1 InvokeID= API server listening at: [::]:60198 "
+70782000,"re> Running the script, i get this error: Traceback (most recent call last): File &quot;/Users/usrname/PycharmProjects/test3/main.py&"
+70910000,o run this crate here and got the following: error: linking with `cc` failed: exit status: 1 ... = note: /usr/b
+70968000,ance Error: fatal: [localhost]: FAILED! =&gt; {&quot;msg&quot;: &quot;The task 
+71020000, is node:internal/errors:464 ErrorCaptureStackTrace(err); ^ Error [ERR_HTTP_HEADERS_SENT]: Cannot set head
+71046000,ot;ESEMPIO.pptx&quot;) I get the following error: UnidentifiedImageError: cannot identify image file &lt
+71076000,b2) I get an error: liquibase.exception.LockException: liquibase.exception.LockException: Did not update change log
+71152000,"ss: com.example.sliderapplication, PID: 17028 java.lang.NullPointerException: Attempt to invoke interface method 'void com.google.android."
+71212000,"ua with :PackerInstall However, getting error: attempt to call global 'buf_set_keymap' (a nil value)<"
+71260000, ... but I get the error &quot;Error: geom_text requires the following missing aesthetics: y&quot;
+71294000,ortedLookAndFeelException ex) { ex.printStackTrace(); } Test test = new Test()
+71324000,", 0, 1); } catch (Exception e){ e.printStackTrace(); } CountDownTimer timer = new CountDown"
+71330000,&lt;/dl&gt; {% elif error_message %} &lt;p&gt;Error: {{ error_message }}&lt;/p&gt; {% endif %} &lt;/div
+71332000,code> with errors- Compiling ed25519 v1.4.0 error: edition 2021 is unstable and only available with -Z unstable
+71450000,"e>Cannot retrieve length of file, path = 'tau_file.mp4' (OS Error: No such file or directory, errno = 2) . The analysis c"
+71484000,"Error in py_call_impl(callable, dots$args, dots$keywords) : ValueError: in user code: File &quot;C:\Users\Ruben\AppData\Local\R-MINI"
+71526000,"lass=""lang-none prettyprint-override""> [: 1: [: Syntax error: Unterminated quoted string How might I fix "
+71608000,">(5, 10, 5) but I am somewhat getting an error ValueError: setting an array element with a sequence. when I try "
+71742000, if(error){ res.status(500).send({Error: error}) } else{ cons
+71748000,"r), newnames2)) Error: FileNotFoundError: [WinError 2] 指定されたファイルが見つかりません。: './data/ M0001 <"
+71770000,to map Message header 'timestamp' to JMS property javax.jms.MessageNotWriteableException: Message properties are read-only at org.apache.activemq.
+71888000,edia/cam_defs.h:9: ./usr/include/linux/videodev2.h:2323:20: error: field has incomplete type 'struct timespec' struct timespec 
+71974000,ng pip from https://bootstrap.pypa.io/pip/2.7/get-pip.py... error: failed to install pip via get-pip.py BUILD FAILED (OS X 12.
+72018000,"n-instance-has-already-been-created"">Alan AI Error Uncaught Error: The Alan Button instance has already been created. There can"
+72226000,sure how to get basename from path_provider. Unhandled Exception: NoSuchMethodError: Class 'SliverMultiBoxAdaptorElement' ha
+72328000,am getting a type error in TensorFlow Keras: TypeError: Dimension value must be integer or None or have an __index__
+72338000,ude &lt;stdlib.h&gt; #include &lt;unistd.h&gt; #include &lt;errno.h&gt; #include &lt;string.h&gt; #include &lt;sys/stat.h&gt;
+72374000,owever I get the following error: Exception: FunctionLoadError: cannot load the BlobFileTrigger function: binding myblob ha
+72382000,">Unfortunately I got the error message: Error: Problem validating fields in app.json. Learn more: <a href="""
+72422000, exception is io.r2dbc.postgresql.client.ReactorNettyClient$PostgresConnectionClosedException: Cannot exchange messages because the connection is closed or
+72474000,rty error. Below is the error output. ninja: error: 'C:/occt-3rdparty/Windows-64-VC14/angle-gles2-2.1.0-46ad513f
+72584000, workspace % podman run docker.io/library/alpine echo hello Error: error preparing container e672734a4e53a77cbf92a39486df2aa49c
+72632000, file: (Here is where I'm getting my error which says &quot;TypeError: connectDB.collection is not a function&quot;) <code
+72674000,code> And this gives me the errors: error[E0515]: cannot return value referencing local variable `mmap` --&g
+72818000,> #10 124.9 scripts/tesseract/endianness.h:20:2: error: #error &quot;I don't know what architecture this is!&quot; #
+72868000,e>engine='xlsxwriter' for append mode. but got ValueError: Append mode is not supported with xlsxwriter! </
+72876000,n $connection; } catch (PDOException $e) { exit(&quot;Error: &quot; . $e-&gt;getMessage()); } } function getData(
+72880000,"y query: const [getCards, { data: cardsData, error: cardsError, loading: cardsLoading }] = useLazyQuery( GET_L"
+72886000,"oes not work, and I get the following error: Error: Can't subset columns that don't exist. x Locations 304, 303,"
+72914000,"ot;, line 1280, in moveTo x, y = _normalizeXYArgs(x, y) TypeError: cannot unpack non-iterable NoneType object &gt;&gt;&gt; </c"
+72936000,"-object-has-no-att"">Python Statsmodels x13_arima_analysis : AttributeError: &#39;dict&#39; object has no attribute &#39;iteritems&#39;</"
+72952000,ll I am getting below. Can you please help ? ImportError: cannot import name 'dnn_logit_fn_builder' from partially ini
+73024000,: Exception in Tkinter callback Traceback (most recent call last): File &quot;C:\Users\kiran\AppData\Local\Programs\Python\
